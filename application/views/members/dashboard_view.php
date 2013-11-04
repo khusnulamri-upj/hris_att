@@ -4,24 +4,8 @@ $this->load->view('template_groundwork/body_header');
 $this->load->view('template_groundwork/body_menu');
 ?>
     <div class="container">
-      <div class="padded">
-        <div class="row">
-          <div class="three fifths bounceInRight animated">
-            <h1 class="zero museo-slab">Responsive Design Made Easy</h1>
-            <p class="quicksand">A responsive HTML5, CSS & Javascript framework created and maintained by <a href="http://twitter.com/ghepting" target="_blank">Gary Hepting</a></p>
-            <p class="quicksand"> </p>
-          </div>
-          <div class="two fifths align-right-ipad align-right-desktop flipInX animated">
-            <p class="quicksand">Get Started</p>
-            <p><a href="layout-a.html" rel="next" class="green button">View Example Layouts </a></p>
-          </div>
-        </div>
-      </div>
-      <hr>
       <div class="row">
         <div class="one whole padded bounceInLeft animated">
-          <h1 data-compression="22.25" data-min="22" class="quicksand responsive">A Responsive HTML5, CSS<br>and Javascript Framework</h1>
-          <h4>Create scalable, accessible web applications that work on virtually anything.</h4>
           <div class="row white box">
             <div class="three-up two-up-small-tablet padded">
               <h4 class="zero"><i class="icon-th icon-2x gap-right"></i> Grid System</h4>
@@ -61,37 +45,6 @@ $this->load->view('template_groundwork/body_menu');
             </div>
           </div>
         </div>
-      </div>
-      <hr>
-      <div class="pad-top pad-left pad-right bounceInRight animated">
-        <h4 class="zero">Example Layouts and Documentation</h4>
-        <p>Rapid prototypes and usage examples to get you started.</p>
-      </div>
-      <div class="row">
-        <div class="one fourth two-up-small-tablet padded bounceInDown animated"><a href="<?php echo base_url('groundwork')?>/docs/layout-a.html">
-            <h5 class="asphalt box align-center">
-              <div class="gap-top gap-bottom"><img src="<?php echo base_url('groundwork')?>/images/layout-a.png" class="round">
-                <div class="small turquoise button">Web Site Layout</div>
-              </div>
-            </h5></a></div>
-        <div class="one fourth two-up-small-tablet padded bounceInLeft animated"><a href="<?php echo base_url('groundwork')?>/docs/layout-b.html">
-            <h5 class="yellow box align-center">
-              <div class="gap-top gap-bottom"><img src="<?php echo base_url('groundwork')?>/images/layout-b.png" class="round">
-                <div class="small orange button">Image Gallery</div>
-              </div>
-            </h5></a></div>
-        <div class="one fourth two-up-small-tablet padded bounceInUp animated"><a href="<?php echo base_url('groundwork')?>/docs/layout-c.html">
-            <h5 class="pink box align-center">
-              <div class="gap-top gap-bottom"><img src="<?php echo base_url('groundwork')?>/images/layout-c.png" class="round">
-                <div class="small purple button">Ecommerce</div>
-              </div>
-            </h5></a></div>
-        <div class="one fourth two-up-small-tablet padded bounceInRight animated"><a href="<?php echo base_url('groundwork')?>/docs/grid.html">
-            <h5 class="green box align-center">
-              <div class="gap-top gap-bottom"><img src="<?php echo base_url('groundwork')?>/images/example-usage.png" class="round">
-                <div class="small asphalt button">Usage Examples</div>
-              </div>
-            </h5></a></div>
       </div>
     </div>
 <?php

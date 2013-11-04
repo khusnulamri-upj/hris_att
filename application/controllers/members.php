@@ -33,12 +33,12 @@ class Members extends CI_Controller {
 
 		// Check user is logged in via either password or 'Remember me'.
 		// Note: Allow access to logged out users that are attempting to validate a change of their email address via the 'update_email' page/method.
-		if (! $this->flexi_auth->is_logged_in() && $this->uri->segment(2) != 'update_email')
+		if (! $this->flexi_auth->is_logged_in())
 		{
 			// Set a custom error message.
 			$this->flexi_auth->set_error_message('You must login to access this area.', TRUE);
 			$this->session->set_flashdata('message', $this->flexi_auth->get_messages());
-			redirect('auth');
+			redirect('user');
 		}
 		
 		// Note: This is only included to create base urls for purposes of this demo only and are not necessarily considered as 'Best practice'.

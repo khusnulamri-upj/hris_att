@@ -14,10 +14,18 @@
               </ul>
             </li>
             <li role="menu">
-              <button title="Members Area">Members Area</button>
+              <button title="Members Area">Member Area</button>
               <ul>
                 <li><a href="<?php echo base_url('members/update_account')?>" title="Update Account Details">Account Details</a></li>
                 <li><a href="<?php echo base_url('members/change_password')?>" title="Update Password">Update Password</a></li>
+              </ul>
+            </li>
+            <li role="menu">
+              <button title="Members Area">Admin Area</button>
+              <ul>
+                <li><a href="<?php echo base_url('admin/manage_user_accounts')?>">Manage User Accounts</a></li>
+                <li><a href="<?php echo base_url('admin/manage_user_groups')?>">Manage User Groups</a></li>
+                <li><a href="<?php echo base_url('admin/manage_privileges')?>">Manage User Privileges</a></li>
               </ul>
             </li>
             <li role="menu">

@@ -113,7 +113,8 @@ class User_model extends CI_Model {
 			array('field' => 'register_phone_number', 'label' => 'Phone Number', 'rules' => 'required'),
 			array('field' => 'register_newsletter', 'label' => 'Newsletter', 'rules' => 'integer'),
 			array('field' => 'register_email_address', 'label' => 'Email Address', 'rules' => 'required|valid_email|identity_available'),
-			array('field' => 'register_username', 'label' => 'Username', 'rules' => 'required|min_length[4]|identity_available'),
+			/* AMRNOTE: username = email */
+                        //array('field' => 'register_username', 'label' => 'Username', 'rules' => 'required|min_length[4]|identity_available'),
 			array('field' => 'register_password', 'label' => 'Password', 'rules' => 'required|validate_password'),
 			array('field' => 'register_confirm_password', 'label' => 'Confirm Password', 'rules' => 'required|matches[register_password]')
 		);
@@ -125,7 +126,9 @@ class User_model extends CI_Model {
 		{
 			// Get user login details from input.
 			$email = $this->input->post('register_email_address');
-			$username = $this->input->post('register_username');
+                        /* AMRNOTE: username = email */
+			//$username = $this->input->post('register_username');
+                        $username = $this->input->post('register_email_address');
 			$password = $this->input->post('register_password');
 			
 			// Get user profile data from input.
@@ -313,7 +316,8 @@ class User_model extends CI_Model {
 			array('field' => 'update_last_name', 'label' => 'Last Name', 'rules' => 'required'),
 			array('field' => 'update_phone_number', 'label' => 'Phone Number', 'rules' => 'required'),
 			array('field' => 'update_newsletter', 'label' => 'Newsletter', 'rules' => 'integer'),
-			array('field' => 'update_email', 'label' => 'Email', 'rules' => 'required|valid_email|identity_available'),
+			/* AMRNOTE: username = email */
+                        //array('field' => 'update_email', 'label' => 'Email', 'rules' => 'required|valid_email|identity_available'),
 			array('field' => 'update_username', 'label' => 'Username', 'rules' => 'min_length[4]|identity_available')
 		);
 		
@@ -339,7 +343,9 @@ class User_model extends CI_Model {
 				'upro_phone' => $this->input->post('update_phone_number'),
 				'upro_newsletter' => $this->input->post('update_newsletter'),
 				$this->flexi_auth->db_column('user_acc', 'email') => $this->input->post('update_email'),
-				$this->flexi_auth->db_column('user_acc', 'username') => $this->input->post('update_username')
+                                /* AMRNOTE: username = email */
+				//$this->flexi_auth->db_column('user_acc', 'username') => $this->input->post('update_username')
+                                $this->flexi_auth->db_column('user_acc', 'username') => $this->input->post('update_email')
 			);
 			
 			// If we were only updating profile data (i.e. no email or username included), we could use the 'update_custom_user_data()' function instead.

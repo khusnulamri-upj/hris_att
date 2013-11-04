@@ -40,7 +40,7 @@ class User extends CI_Controller {
 			// Redirect logged in admins (For security, admin users should always sign in via Password rather than 'Remember me'.
 			if ($this->flexi_auth->is_admin()) 
 			{
-				redirect('auth_admin/dashboard');
+				redirect('admin/dashboard');
 			}
 			else
 			{

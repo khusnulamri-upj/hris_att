@@ -47,13 +47,19 @@ $this->load->view('template_groundwork/body_menu');
                   <?php echo form_input('update_phone_number', isset($user['upro_phone'])?$user['upro_phone']:''); ?>
                 </div>
               </div>
-              <div class="row">
+              <!-- AMRNOTE: update db tidak jalan, value checkbox tidak berubah -->
+              <!--<div class="row">
                 <div class="four fifth padded">
-                  <?php $newsletter = ($user['upro_newsletter'] == 1?' checked="checked" value="1"':' value="0"') ;?>
-                  <input type="checkbox" name="update_newsletter"<?php echo $newsletter; ?>>
+                  <?php
+                  if ($user['upro_newsletter'] == 1) {
+                      echo form_checkbox('update_newsletter', 1, TRUE);
+                  } else {
+                      echo form_checkbox('update_newsletter', 0, FALSE);
+                  }
+                  ?>
                   <label for="update_newsletter" class="inline">Subscribe to Newsletter</label>
                 </div>
-              </div>
+              </div>-->
               <br/>
             </fieldset>
             <br/>
@@ -62,15 +68,23 @@ $this->load->view('template_groundwork/body_menu');
               <div class="row">
                 <div class="four fifth padded">
                   <label for="update_email">Email</label>
-                  <?php echo form_input('update_email', isset($user[$this->flexi_auth->db_column('user_acc', 'email')])?$user[$this->flexi_auth->db_column('user_acc', 'email')]:''); ?>
+                  <?php
+                  $data = array(
+                      'name' => 'update_email',
+                      'value' => isset($user[$this->flexi_auth->db_column('user_acc', 'email')])?$user[$this->flexi_auth->db_column('user_acc', 'email')]:'',
+                      //'disabled' => 'disabled',
+                  );
+                  echo form_input($data);
+                  ?>
                 </div>
               </div>
-              <div class="row">
+              <!-- AMRNOTE: username = email -->
+              <!--<div class="row">
                 <div class="four fifth padded">
                   <label for="update_username">Username</label>
                   <?php echo form_input('update_username', isset($user[$this->flexi_auth->db_column('user_acc', 'username')])?$user[$this->flexi_auth->db_column('user_acc', 'username')]:''); ?>
                 </div>
-              </div>
+              </div>-->
               <div class="row">
                 <div class="four fifth padded">
                   <label for="Password">Password</label>

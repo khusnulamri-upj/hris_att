@@ -47,12 +47,13 @@ $this->load->view('template_groundwork/body_menu');
                   <?php echo form_input('register_phone_number'); ?>
                 </div>
               </div>
-              <div class="row">
+              <!-- AMRNOTE: di update account belum bisa update -->
+              <!--<div class="row">
                 <div class="four fifth padded">
-                  <input type="checkbox" name="register_newsletter" checked="checked" value="1">
+                  <input type="checkbox" name="register_newsletter" checked="checked" value=1>
                   <label for="register_newsletter" class="inline">Subscribe to Newsletter</label>
                 </div>
-              </div>
+              </div>-->
               <br/>
             </fieldset>
             <br/>
@@ -64,12 +65,13 @@ $this->load->view('template_groundwork/body_menu');
                   <?php echo form_input('register_email_address'); ?>
                 </div>
               </div>
-              <div class="row">
+              <!-- AMRNOTE: username = email -->
+              <!--<div class="row">
                 <div class="four fifth padded">
                   <label for="register_username">Username</label>
                   <?php echo form_input('register_username'); ?>
                 </div>
-              </div>
+              </div>-->
               <div class="row">
                 <div class="four fifth padded">
                   <label for="register_password">Password</label>

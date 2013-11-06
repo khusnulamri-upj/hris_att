@@ -13,3 +13,12 @@ if (!function_exists('get_array_value_do_ucwords')) {
     }
 
 }
+
+if (!function_exists('do_ucwords')) {
+
+    function do_ucwords($string = array()) {
+        $ucstring = ucwords(strtolower($string));
+        return $ucstring;
+    }
+
+}

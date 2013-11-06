@@ -7,7 +7,7 @@ $this->load->view('template_groundwork/body_menu');
       <div class="padded">
         <div class="row">
           <div class="one whole bounceInRight animated">
-            <h3 class="zero museo-slab">Input Presensi Karyawan/Dosen</h3>
+            <h3 class="zero museo-slab">Input Keterangan Presensi Karyawan/Dosen</h3>
             <!--<p class="quicksand">Input Presensi Karyawan/Dosen</p>-->
           </div>
         </div>
@@ -18,21 +18,21 @@ $this->load->view('template_groundwork/body_menu');
             <div class="box info">
               <div class="equalize row">
                 <div class="two seventh half-padded">Nama Karyawan/Dosen</div>
-                <div class="five seventh half-padded"><b>Khusnul Amri</b></div>
+                <div class="five seventh half-padded"><b><?php echo $personnel_name?></b></div>
               </div>
               <div class="equalize row">
                 <div class="two seventh half-padded">Bagian/Prodi</div>
-                <div class="five seventh half-padded"><b>ICT</b></div>
+                <div class="five seventh half-padded"><b><?php echo $department_name?></b></div>
               </div>
               <div class="equalize row">
                 <div class="two seventh half-padded">Bulan</div>
-                <div class="five seventh half-padded"><b>September 2013</b></div>
+                <div class="five seventh half-padded"><b><?php echo $month_year?></b></div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <form action="<?php echo site_url('attendance/save_ent')?>" method="post">
+      <form action="<?php echo $form_action_url; ?>" method="post">
       <?php
       echo form_hidden('personnel', $personnel);
       echo form_hidden('year', $year);
@@ -75,7 +75,7 @@ $this->load->view('template_groundwork/body_menu');
                   <div class=\"one seventh padded align-center$mark_is_holiday\">$a->hari</div>
                   <div class=\"one seventh padded align-center$mark_is_holiday$mark_is_late\">$a->jam_masuk</div>
                   <div class=\"one seventh padded align-center$mark_is_holiday$mark_is_early\">$a->jam_keluar</div>
-                  <div class=\"one seventh padded align-center$mark_is_holiday\">$a->detik_telat_masuk</div>
+                  <div class=\"one seventh padded align-center$mark_is_holiday\">$a->waktu_telat_masuk</div>
                   <div class=\"two seventh half-padded align-center$mark_is_holiday\">$select_ket</div>
                 </div>
                 ";
@@ -84,7 +84,20 @@ $this->load->view('template_groundwork/body_menu');
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="three fifth padded">
+          <div class="row">
+            <div class="one half bounceInLeft animated">
+              <input type="submit" value="Simpan Data" />
+            </div>
+            <div class="one half bounceInLeft animated align-right">
+              <a role="button" href="<?php echo $export_xls1_url; ?>">Export ke XLS</a>
+            </div>
+          </div>
+        </div>
+      </div>
       </form>
+      <br/>
     </div>
 <?php
 $this->load->view('template_groundwork/body_link');

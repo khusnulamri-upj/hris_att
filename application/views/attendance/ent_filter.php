@@ -14,14 +14,16 @@ $this->load->view('template_groundwork/body_menu');
       </div>
       <?php if (!empty($message)) { ?>
       <div class="row bounceInLeft animated">
-        <div class="one half centered align-center">
-          <div class="row"><?php echo $message; ?></div>
+        <div class="one half padded align-center">
+          <div class="row"><p class="message dismissible<?php echo (!empty($message_type))?' '.$message_type:' error'; ?>"><?php echo $message; ?><p></div>
         </div>
       </div>
+      <?php } else { ?>
+      <br/>    
       <?php } ?>
       <div class="row bounceInRight animated">
         <div class="one half padded">
-          <form action="<?php echo site_url('attendance/personnel_ent')?>" method="post">
+          <form action="<?php echo $form_action_url; ?>" method="post">
             <fieldset>
               <div class="row">
                 <div class="four fifth padded">

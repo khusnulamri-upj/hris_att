@@ -34,7 +34,7 @@ class Attendance extends CI_Controller {
 
         // Check user is logged in via either password or 'Remember me'.
         // Note: Allow access to logged out users that are attempting to validate a change of their email address via the 'update_email' page/method.
-        if (!$this->flexi_auth->is_logged_in() && $this->uri->segment(2) != 'update_email') {
+        if (!$this->flexi_auth->is_logged_in()) {
             // Set a custom error message.
             $this->flexi_auth->set_error_message('You must login to access this area.', TRUE);
             $this->session->set_flashdata('message', $this->flexi_auth->get_messages());
@@ -58,6 +58,7 @@ class Attendance extends CI_Controller {
         $this->filter_ent();
     }
     
+    var $filter_ent_alias = 'entry';
     public function filter_ent() {
         $this->load->helper('custom_string');
         $this->load->model('Personnel_model');
@@ -70,11 +71,19 @@ class Attendance extends CI_Controller {
         $data['year_option'] = $this->Attendance_model->get_all_year();
         
         // Get any status message that may have been set.
-	$this->data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
-                
+	$data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
+        $data['message_type'] = (! isset($this->data['message_type'])) ? $this->session->flashdata('message_type') : $this->data['message_type'];
+        
+        $data['form_action_url'] = site_url('attendance/'.$this->personnel_ent_alias);
+        
         $this->load->view('attendance/ent_filter',$data);
     }
     
+    public function entry1($personnel = NULL, $year = NULL, $month = NULL) {
+        $this->personnel_ent($personnel, $year, $month);
+    }
+    
+    var $personnel_ent_alias = 'entry1';
     public function personnel_ent($personnel = NULL, $year = NULL, $month = NULL) {
         $this->load->model('Attendance_model');
         $arr_ket[0] = '';
@@ -89,44 +98,35 @@ class Attendance extends CI_Controller {
             $data['month'] = $month;
         } else {
             $this->session->set_flashdata('message', 'Unable to find attendance data.');
-            redirect('attendance/filter_ent');
+            $this->session->set_flashdata('message_type', 'error');
+            redirect('attendance/'.$this->filter_ent_alias);
         }
         
         $data['keterangan_option'] = $this->Attendance_model->get_all_keterangan($arr_ket);
         $data['attendance'] = $this->Attendance_model->get_attendance_data_personnel_monthly($data['personnel'],$data['year'],$data['month']);
+        
+        if ($data['attendance'] == NULL) {
+            $this->session->set_flashdata('message', 'Unable to find attendance data.');
+            $this->session->set_flashdata('message_type', 'warning');
+            redirect('attendance/'.$this->filter_ent_alias);
+        }
+        
+        $this->load->helper('custom_string');
+        $this->load->model('Personnel_model');
+        $data['personnel_name'] = do_ucwords($this->Personnel_model->get_personnel_name($data['personnel']));
+        
+        $this->load->model('Department_model');
+        $data['department_name'] = do_ucwords($this->Department_model->get_department_name($this->Personnel_model->get_dept_id($data['personnel'])));
+        
+        $this->load->helper('custom_date');
+        $data['month_year'] = get_month_name($data['month']).' '.$data['year'];
+        
+        $data['form_action_url'] = site_url('attendance/save_ent');
+        
+        $data['export_xls1_url'] = site_url('export/xls1/'.$data['personnel'].'/'.$data['year'].'/'.$data['month']);
         
         $this->load->view('attendance/ent_personnel',$data);
     }
-    
-    /*public function personnel_ent($personnel = NULL, $year = NULL, $month = NULL, $from_save = FALSE) {
-        $this->load->model('Attendance_model');
-        $arr_ket[0] = '';
-        
-        if (!$from_save) {
-            $data['personnel'] = $this->input->post('personnel');
-            $data['year'] = $this->input->post('year');
-            $data['month'] = $this->input->post('month');
-        } else {
-            $data['personnel'] = $personnel;
-            $data['year'] = $year;
-            $data['month'] = $month;
-        }
-        
-        $data['keterangan_option'] = $this->Attendance_model->get_all_keterangan($arr_ket);
-        $data['attendance'] = $this->Attendance_model->get_attendance_data_personnel_monthly($data['personnel'],$data['year'],$data['month']);
-        
-        var_dump($data);
-        
-        $this->load->view('attendance/ent_personnel',$data);
-    }*/
-    
-    /*public function personnel_ent($personnel,$year,$month) {
-        $this->load->model('Attendance_model');
-        $arr_ket[0] = '';
-        $data['keterangan_option'] = $this->Attendance_model->get_all_keterangan($arr_ket);
-        $data['attendance'] = $this->Attendance_model->get_attendance_data_personnel_monthly($personnel,$year,$month);
-        $this->load->view('ent_personnel',$data);
-    }*/
     
     public function save_ent() {
         $this->load->model('Attendance_model');
@@ -135,9 +135,8 @@ class Attendance extends CI_Controller {
         $month = $this->input->post('month');
         $ket = $this->input->post('keterangan');
         $success = $this->Attendance_model->insert_keterangan($personnel,$year,$month,$ket);
-        if ($success >= 0) {
-            $this->personnel_ent(TRUE,$personnel,$year,$month);
-        }
+        //var_dump($success); //AMRNOTE: FALSE == 100
+        redirect('attendance/'.$this->personnel_ent_alias.'/'.$personnel.'/'.$year.'/'.$month);
     }
     
     //menu report

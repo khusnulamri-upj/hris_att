@@ -84,13 +84,36 @@ $this->load->view('template_groundwork/body_menu');
           </div>
         </div>
       </div>
+      <div class="three fifth padded">
+        <div class="box alert bounceInRight animated">
+          <div class="row">
+            <div class="two seventh half-padded"><b>JUMLAH KETERANGAN</b></div>
+          </div>      
+          <?php
+          $i = 0;
+          foreach ($summary_of_keterangan as $sk) {
+            if (($i % 2) == 0) {
+              echo "<div class=\"equalize row\">";
+            }
+            echo "
+                <div class=\"two seventh half-padded\">$sk->keterangan</div>
+                <div class=\"one seventh half-padded\">$sk->jumlah</div>
+            ";
+            if (($i % 2) != 0) {
+              echo "</div>";
+            }
+            $i++;
+          }
+          ?>
+        </div>
+      </div>
       <div class="row">
         <div class="three fifth padded">
           <div class="row">
-            <div class="one half bounceInLeft animated">
+            <div class="one half bounceInUp animated">
               <input type="submit" value="Simpan Data" />
             </div>
-            <div class="one half bounceInLeft animated align-right">
+            <div class="one half bounceInUp animated align-right">
               <a role="button" href="<?php echo $export_xls1_url; ?>">Export ke XLS</a>
             </div>
           </div>

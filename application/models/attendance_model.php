@@ -93,97 +93,6 @@ class Attendance_model extends CI_Model {
         
         $this->load->database('default');
         
-        /*$sql = "SELECT gen_lbr2.tanggal,
-            gen_lbr2.hari,
-            att2.jam_masuk,
-            att2.jam_keluar,
-            att2.opt_keterangan,
-            opt.content AS keterangan,
-            att2.detik_telat_masuk,
-            att2.is_late,
-            att2.is_early,
-            gen_lbr2.is_holiday,
-            gen_lbr2.desc_holiday
-            FROM (
-              SELECT gen_lbr.*
-              FROM (  
-                SELECT gen.*,
-                lbr.deskripsi AS desc_holiday,
-                IF(lbr.deskripsi IS NULL,0,1) AS is_holiday
-                FROM (  
-                    SELECT DATE_FORMAT(DATE_ADD(MAKEDATE(z.tahun, z.gen_date), INTERVAL (z.bulan-1) MONTH),?) AS tanggal,
-                    DATE_FORMAT(DATE_ADD(MAKEDATE(z.tahun, z.gen_date), INTERVAL (z.bulan-1) MONTH),'%a') AS hari
-                    FROM (
-                      SELECT gen_date,
-                      ? AS tahun,
-                      ? AS bulan
-                      FROM tabel_helper
-                    ) z
-                    GROUP BY z.gen_date
-                    ORDER BY z.gen_date
-                ) gen
-                LEFT OUTER JOIN (
-                  SELECT *
-                  FROM libur
-                  ORDER BY libur.tgl DESC
-                ) lbr
-                ON ((UPPER(gen.hari) = UPPER(lbr.hari)) AND (lbr.tgl IS NULL))
-                OR ((gen.tanggal = DATE_FORMAT(lbr.tgl,'%d/%m/%Y')) AND (lbr.hari IS NULL))
-                AND lbr.expired_time IS NULL
-              ) gen_lbr
-              GROUP BY gen_lbr.tanggal
-            ) gen_lbr2
-            LEFT OUTER JOIN (
-              SELECT att.user_id,
-              att.tanggal,
-              att.is_same,
-              att.jam_masuk,
-              att.jam_keluar,
-              att.is_late,
-              att.detik_telat_masuk,
-              att.is_early,
-              MAX(att.opt_keterangan) AS opt_keterangan
-              FROM (
-                SELECT aa.user_id,
-                aa.tanggal,
-                aa.is_same,
-                DATE_FORMAT(aa.enter_time,'%H:%i') AS jam_masuk,
-                DATE_FORMAT(aa.leave_time,'%H:%i') AS jam_keluar,
-                IF(aa.enter_time > '07:40', 1, 0) AS is_late,
-                TIME_TO_SEC(IF(TIMEDIFF(DATE_FORMAT(aa.enter_time,'%H:%i'),'07:40') > 0, TIMEDIFF(DATE_FORMAT(aa.enter_time,'%H:%i'),'07:40'), NULL)) AS detik_telat_masuk,
-                IF(aa.leave_time < '16:30', 1, 0) AS is_early,
-                NULL AS opt_keterangan
-                FROM (
-                  SELECT a.user_id,
-                  DATE_FORMAT(a.date,'%d/%m/%Y') AS tanggal,
-                  IF(a.max_time = a.min_time,IF(TIMEDIFF(DATE_FORMAT(a.min_time,'%H:%i'),'12:00') >= 0,NULL,a.min_time),a.min_time) AS enter_time,
-                  IF(a.max_time = a.min_time,IF(TIMEDIFF('12:00',DATE_FORMAT(a.max_time,'%H:%i')) > 0,NULL,a.max_time),a.max_time) AS leave_time,
-                  IF(a.max_time = a.min_time,1,0) AS is_same
-                  FROM attendance a
-                  WHERE a.user_id = ?
-                ) aa
-                UNION
-                SELECT k.user_id,
-                DATE_FORMAT(k.tgl,'%d/%m/%Y') AS tanggal,
-                NULL,
-                NULL,
-                NULL,
-                NULL,
-                NULL,
-                NULL,
-                k.opt_keterangan
-                FROM keterangan k
-                LEFT OUTER JOIN opt_keterangan o
-                ON k.opt_keterangan = o.opt_keterangan_id
-                WHERE k.expired_time IS NULL
-                AND k.user_id = ?
-              ) att
-              GROUP BY att.tanggal
-            ) att2
-            ON gen_lbr2.tanggal = att2.tanggal
-            LEFT OUTER JOIN opt_keterangan opt
-            ON att2.opt_keterangan = opt.opt_keterangan_id";*/
-        
         $sql = "SELECT gen_lbr2.tanggal,
             gen_lbr2.hari,
             att2.jam_masuk,
@@ -223,9 +132,8 @@ class Attendance_model extends CI_Model {
                   FROM libur
                   ORDER BY libur.tgl DESC
                 ) lbr
-                ON ((UPPER(gen.hari) = UPPER(lbr.hari)) AND (lbr.tgl IS NULL))
-                OR ((gen.tanggal = DATE_FORMAT(lbr.tgl,'$fmt_date')) AND (lbr.hari IS NULL))
-                AND lbr.expired_time IS NULL
+                ON ((UPPER(gen.hari) = UPPER(lbr.hari)) AND (lbr.tgl IS NULL) AND lbr.expired_time IS NULL)
+                OR ((gen.tanggal = DATE_FORMAT(lbr.tgl,'$fmt_date')) AND (lbr.hari IS NULL) AND lbr.expired_time IS NULL)
               ) gen_lbr
               GROUP BY gen_lbr.tanggal
             ) gen_lbr2
@@ -357,17 +265,37 @@ class Attendance_model extends CI_Model {
         return ($row_inserted*100+$row_deleted); //AMRNOTE: FALSE == 100
     }
     
-    /*SELECT o.opt_keterangan_id AS id, o.content AS keterangan, count(a.user_id) AS jumlah
-                FROM opt_keterangan o
-                LEFT OUTER JOIN (
-                SELECT k.*
-                FROM keterangan k
-                WHERE k.user_id = 30
-                AND k.tgl > DATE_ADD(MAKEDATE(2013, 31), INTERVAL (9-2) MONTH)
-            AND k.tgl < DATE_ADD(MAKEDATE(2013, 1), INTERVAL (9) MONTH)
-                AND k.expired_time IS NULL
-                ) a ON o.opt_keterangan_id = a.opt_keterangan
-                GROUP BY o.opt_keterangan_id*/
+    function get_summary_of_keterangan($user_id,$tahun,$bulan) {
+        if (empty($user_id) || empty($tahun) || empty($bulan)) {
+            return NULL;
+        }
+        
+        if (!$this->is_attendance_data_exist($user_id, $tahun, $bulan)) {
+            return NULL;
+        }
+    
+        $sql = "SELECT o.opt_keterangan_id AS id,
+            o.content AS keterangan,
+            count(a.user_id) AS jumlah
+            FROM opt_keterangan o
+            LEFT OUTER JOIN (
+            SELECT k.*
+            FROM keterangan k
+            WHERE k.user_id = $user_id
+            AND k.tgl > DATE_ADD(MAKEDATE($tahun, 31), INTERVAL ($bulan-2) MONTH)
+            AND k.tgl < DATE_ADD(MAKEDATE($tahun, 1), INTERVAL ($bulan) MONTH)
+            AND k.expired_time IS NULL
+            ) a ON o.opt_keterangan_id = a.opt_keterangan
+            GROUP BY o.opt_keterangan_id";
+         
+        $query = $this->db->query($sql);
+        $return = NULL;
+        if ($query->num_rows() > 0) {
+            $return = $query->result();
+        }
+        $this->db->close();
+        return $return;
+    }
     
 }
 

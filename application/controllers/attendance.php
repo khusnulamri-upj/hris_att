@@ -125,6 +125,8 @@ class Attendance extends CI_Controller {
         
         $data['export_xls1_url'] = site_url('export/xls1/'.$data['personnel'].'/'.$data['year'].'/'.$data['month']);
         
+        $data['summary_of_keterangan'] = $this->Attendance_model->get_summary_of_keterangan($data['personnel'],$data['year'],$data['month']);
+        
         $this->load->view('attendance/ent_personnel',$data);
     }
     

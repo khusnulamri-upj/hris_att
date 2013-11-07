@@ -42,8 +42,8 @@ class Attendance extends CI_Controller {
         }
 
         // Note: This is only included to create base urls for purposes of this demo only and are not necessarily considered as 'Best practice'.
-        $this->load->vars('base_url', 'http://localhost/hris_att/');
-        $this->load->vars('includes_dir', 'http://localhost/hris_att/includes/');
+        $this->load->vars('base_url', 'http://server.upj/presensi2/');
+        $this->load->vars('includes_dir', 'http://server.upj/presensi2/includes/');
         $this->load->vars('current_url', $this->uri->uri_to_assoc(1));
 
         // Define a global variable to store data that is then used by the end view page.
@@ -143,9 +143,9 @@ class Attendance extends CI_Controller {
     }
     
     //menu report
-    /*public function report() {
-        $this->reporta();
-    }*/
+    public function report() {
+        $this->load->view('layout');
+    }
     
     public function reporta() {
         $this->filter_prsn_mnth_rpt();
@@ -167,66 +167,10 @@ class Attendance extends CI_Controller {
 	$data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
         $data['message_type'] = (! isset($this->data['message_type'])) ? $this->session->flashdata('message_type') : $this->data['message_type'];
         
-        $data['form_action_url'] = site_url('attendance/'.$this->prsn_mnth_rpt_alias);
+        $data['form_action_url'] = site_url('attendance/'.$this->filter_prsn_mnth_rpt_alias);
         
         $this->load->view('attendance/rpt_filter_prsn_mnth',$data);
     }
-    
-    public function report1($personnel = NULL, $year = NULL, $month = NULL) {
-        $this->prsn_mnth_rpt($personnel, $year, $month);
-    }
-    
-    var $prsn_mnth_rpt_alias = 'report1';
-    public function prsn_mnth_rpt($personnel = NULL, $year = NULL, $month = NULL) {
-        $this->load->model('Attendance_model');
-        $arr_ket[0] = '';
-        
-        if (($this->input->post('personnel') != '') && ($this->input->post('year') != '') && ($this->input->post('month') != '')) {
-            $data['personnel'] = $this->input->post('personnel');
-            $data['year'] = $this->input->post('year');
-            $data['month'] = $this->input->post('month');
-        } else if (($personnel != NULL) && ($year != NULL) && ($month != NULL)) {
-            $data['personnel'] = $personnel;
-            $data['year'] = $year;
-            $data['month'] = $month;
-        } else {
-            $this->session->set_flashdata('message', 'Unable to find attendance data.');
-            $this->session->set_flashdata('message_type', 'error');
-            redirect('attendance/'.$this->filter_prsn_mnth_rpt_alias);
-        }
-        
-        $data['keterangan_option'] = $this->Attendance_model->get_all_keterangan($arr_ket);
-        $data['attendance'] = $this->Attendance_model->get_attendance_data_personnel_monthly($data['personnel'],$data['year'],$data['month']);
-        $data['summary_attendance'] = $this->Attendance_model->get_summary_attendance_data_personnel_monthly($data['personnel'],$data['year'],$data['month']);
-        
-        if ($data['attendance'] == NULL) {
-            $this->session->set_flashdata('message', 'Unable to find attendance data.');
-            $this->session->set_flashdata('message_type', 'warning');
-            redirect('attendance/'.$this->filter_prsn_mnth_rpt_alias);
-        }
-        
-        $this->load->helper('custom_string');
-        $this->load->model('Personnel_model');
-        $data['personnel_name'] = do_ucwords($this->Personnel_model->get_personnel_name($data['personnel']));
-        
-        $this->load->model('Department_model');
-        $data['department_name'] = do_ucwords($this->Department_model->get_department_name($this->Personnel_model->get_dept_id($data['personnel'])));
-        
-        $this->load->helper('custom_date');
-        $data['month_year'] = get_month_name($data['month']).' '.$data['year'];
-        
-        //$data['form_action_url'] = site_url('attendance/save_ent');
-        
-        $data['export_xls1_url'] = site_url('export/xls1/'.$data['personnel'].'/'.$data['year'].'/'.$data['month']);
-        
-        $data['summary_of_keterangan'] = $this->Attendance_model->get_summary_of_keterangan($data['personnel'],$data['year'],$data['month']);
-        
-        $this->load->view('attendance/rpt_prsn_mnth',$data);
-    }
-    
-    
-    
-    
     
     public function personnel_monthly_rpt() {
         $this->load->model('Attendance_model');

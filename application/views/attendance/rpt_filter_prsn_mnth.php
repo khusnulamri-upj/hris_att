@@ -1,20 +1,29 @@
 <?php
-$this->load->view('layout/head');
-$this->load->view('layout/body_header');
-$this->load->view('layout/body_menu');
+$this->load->view('template_groundwork/head');
+$this->load->view('template_groundwork/body_header');
+$this->load->view('template_groundwork/body_menu');
 ?>
     <div class="container">
       <div class="padded">
         <div class="row">
           <div class="one whole bounceInRight animated">
-            <h3 class="zero museo-slab">Laporan Presensi Karyawan/Dosen Per Bulan</h3>
-            <!--<p class="quicksand">Laporan Presensi Karyawan/Dosen Per Bulan</p>-->
+            <h3 class="zero museo-slab">Laporan Presensi Per Bulan Per Karyawan/Dosen</h3>
+            <!--<p class="quicksand">Laporan Presensi Per Bulan Per Karyawan/Dosen</p>-->
           </div>
         </div>
       </div>
+      <?php if (!empty($message)) { ?>
+      <div class="row bounceInLeft animated">
+        <div class="one half padded align-center">
+          <div class="row"><p class="message dismissible<?php echo (!empty($message_type))?' '.$message_type:' error'; ?>"><?php echo $message; ?><p></div>
+        </div>
+      </div>
+      <?php } else { ?>
+      <br/>    
+      <?php } ?>
       <div class="row bounceInRight animated">
         <div class="one half padded">
-          <form action="<?php echo site_url('attendance/personnel_monthly_rpt')?>" method="post">
+          <form action="<?php echo $form_action_url; ?>" method="post">
             <fieldset>
               <div class="row">
                 <div class="four fifth padded">
@@ -45,6 +54,6 @@ $this->load->view('layout/body_menu');
       <br/><br/>
     </div>
 <?php
-$this->load->view('layout/body_link');
-$this->load->view('layout/body_footer');
+$this->load->view('template_groundwork/body_link');
+$this->load->view('template_groundwork/body_footer');
 ?>

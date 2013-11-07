@@ -198,6 +198,105 @@ class Attendance_model extends CI_Model {
         return $return;
     }
     
+    function get_summary_attendance_data_personnel_monthly($user_id,$tahun,$bulan) {
+        if (empty($user_id) || empty($tahun) || empty($bulan)) {
+            return NULL;
+        }
+        
+        if (!$this->is_attendance_data_exist($user_id, $tahun, $bulan)) {
+            return NULL;
+        }
+        
+        $fmt_date = '%d/%m/%Y';
+        $fmt_time = '%H:%i';
+        $late_limit = '07:40';
+        $early_limit = '16:30';
+        $time_divider = '12:00';
+        
+        $this->load->database('default');
+        
+        $sql = "SELECT TIME_FORMAT(SEC_TO_TIME(SUM(summ.detik_telat_masuk)),'$fmt_time') AS sum_waktu_telat_masuk, SUM(summ.detik_telat_masuk) AS sum_detik_telat_masuk, SUM(summ.is_late) AS sum_is_late, SUM(summ.counter_hadir) AS sum_counter_hadir FROM (
+          SELECT gen_lbr2.tanggal,
+            att2.opt_keterangan,
+            opt.content AS keterangan,
+            if(att2.detik_telat_masuk,att2.detik_telat_masuk,0) AS detik_telat_masuk,
+            if(att2.is_late,att2.is_late,0) AS is_late,
+            if(att2.is_early,att2.is_early,0) AS is_early,
+            if(att2.counter_hadir,att2.counter_hadir,0) AS counter_hadir
+            FROM (
+              SELECT gen_lbr.*
+              FROM (  
+                SELECT gen.*
+                FROM (  
+                    SELECT DATE_FORMAT(DATE_ADD(MAKEDATE(z.tahun, z.gen_date), INTERVAL (z.bulan-1) MONTH),'$fmt_date') AS tanggal
+                    FROM (
+                      SELECT gen_date,
+                      $tahun AS tahun,
+                      $bulan AS bulan
+                      FROM tabel_helper
+                    ) z
+                    GROUP BY z.gen_date
+                    ORDER BY z.gen_date
+                ) gen
+              ) gen_lbr
+              GROUP BY gen_lbr.tanggal
+            ) gen_lbr2
+            LEFT OUTER JOIN (
+              SELECT att.user_id,
+              att.tanggal,
+              att.is_late,
+              att.detik_telat_masuk,
+              att.is_early,
+              MAX(att.opt_keterangan) AS opt_keterangan,
+              MAX(att.counter_hadir) AS counter_hadir
+              FROM (
+                SELECT aa.user_id,
+                aa.tanggal,
+                IF(aa.enter_time > '$late_limit', 1, 0) AS is_late,
+                TIME_TO_SEC(IF(TIMEDIFF(DATE_FORMAT(aa.enter_time,'$fmt_time'),'$late_limit') > 0, TIMEDIFF(DATE_FORMAT(aa.enter_time,'$fmt_time'),'$late_limit'), NULL)) AS detik_telat_masuk,
+                IF(aa.leave_time < '$early_limit', 1, 0) AS is_early,
+                NULL AS opt_keterangan,
+                1 AS counter_hadir
+                FROM (
+                  SELECT a.user_id,
+                  DATE_FORMAT(a.date,'$fmt_date') AS tanggal,
+                  IF(a.max_time = a.min_time,IF(TIMEDIFF(DATE_FORMAT(a.min_time,'$fmt_time'),'$time_divider') >= 0,NULL,a.min_time),a.min_time) AS enter_time,
+                  IF(a.max_time = a.min_time,IF(TIMEDIFF('$time_divider',DATE_FORMAT(a.max_time,'$fmt_time')) > 0,NULL,a.max_time),a.max_time) AS leave_time
+                  FROM attendance a
+                  WHERE a.user_id = $user_id
+                ) aa
+                UNION
+                SELECT k.user_id,
+                DATE_FORMAT(k.tgl,'$fmt_date') AS tanggal,
+                NULL,
+                NULL,
+                NULL,
+                k.opt_keterangan,
+                o.counter_hadir
+                FROM keterangan k
+                LEFT OUTER JOIN opt_keterangan o
+                ON k.opt_keterangan = o.opt_keterangan_id
+                WHERE k.expired_time IS NULL
+                AND k.user_id = $user_id
+              ) att
+              GROUP BY att.tanggal
+            ) att2
+            ON gen_lbr2.tanggal = att2.tanggal
+            LEFT OUTER JOIN opt_keterangan opt
+            ON att2.opt_keterangan = opt.opt_keterangan_id
+          ) summ";
+        
+        //$query = $this->db->query($sql, array($fmt_date, (integer)$bulan, (integer)$tahun, (integer)$user_id, (integer)$user_id));
+        $query = $this->db->query($sql);
+        $return = NULL;
+        if ($query->num_rows() == 1) {
+            $return = $query->row();
+        }
+        $this->db->close();
+        return $return;
+    }
+    
+    
     function insert_keterangan($user_id,$tahun,$bulan,$arr_ket) {
         $current_user_id = $this->flexi_auth->get_user_id();
         

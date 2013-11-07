@@ -4,13 +4,13 @@
               <button title="Presensi Karyawan/Dosen"><i class="icon-group"></i>&nbsp;Presensi Karyawan/Dosen</button>
               <ul>
                 <li><a href="<?php echo site_url('attendance/entry')?>" title="Input Keterangan Presensi Karyawan/Dosen">Input Keterangan</a></li>
-                <li role="menu">
+                <!--<li role="menu">
                     <button title="Laporan Presensi Karyawan/Dosen">Laporan Presensi</button>
                     <ul>
-                        <li><a href="<?php echo site_url('attendance/reporta')?>" title="Laporan Presensi Per Bulan Per Karyawan/Dosen">Per Bulan Per Karyawan/Dosen</a></li>
-                        <li><a href="<?php echo site_url('attendance/reportb')?>" title="Laporan Presensi Per Tahun Per Bagian/Prodi">Per Tahun Per Bagian/Prodi</a></li>
+                        <li><a href="<?php echo site_url('attendance/filter_prsn_mnth_rpt')?>" title="Laporan Presensi Per Bulan Per Karyawan/Dosen">Per Bulan Per Karyawan/Dosen</a></li>
+                        <li><a href="<?php echo site_url('attendance/filter_dept_year_rpt')?>" title="Laporan Presensi Per Tahun Per Bagian/Prodi">Per Tahun Per Bagian/Prodi</a></li>
                     </ul>
-                </li>
+                </li>-->
               </ul>
             </li>
             <li role="menu">
@@ -20,7 +20,7 @@
                 <li><a href="<?php echo base_url('members/change_password')?>" title="Update Password">Update Password</a></li>
               </ul>
             </li>
-            <li role="menu">
+            <!--<li role="menu">
               <button title="Members Area">Admin Area</button>
               <ul>
                 <li><a href="<?php echo base_url('admin/manage_user_accounts')?>">Manage User Accounts</a></li>
@@ -51,7 +51,7 @@
                 <li><a href="<?php echo base_url('groundwork')?>/docs/placeholder-text.html" title="Placeholder text and placeholder fonts for rapid prototyping and wireframes">Placeholder Text</a></li>
                 <li><a href="<?php echo base_url('groundwork')?>/docs/animations.html" title="Pure CSS3 Animations">Animations</a></li>
               </ul>
-            </li>
+            </li>-->
           </ul>
         </nav>
       </div>

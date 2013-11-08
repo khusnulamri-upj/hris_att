@@ -303,6 +303,9 @@ class Export extends CI_Controller {
         $this->load->model('Department_model');
         $department_name = do_ucwords($this->Department_model->get_department_name($dept_id));
         
+        $this->load->helper('custom_date');
+        $all_month = get_all_month_name();
+        
         $sheetNow = 0;
         
         //HEADER VALUE
@@ -325,9 +328,6 @@ class Export extends CI_Controller {
         $objPHPExcel->getActiveSheet()->getStyle('C2:C3')->getFont()->setBold(true);
         
         $objPHPExcel->getActiveSheet()->getRowDimension('1')->setRowHeight(30);
-        
-        $this->load->helper('custom_date');
-        $all_month = get_all_month_name();
         
         $objPHPExcel->getActiveSheet()->setCellValue('A5', 'BULAN');
         $objPHPExcel->getActiveSheet()->mergeCells('A5:A7');

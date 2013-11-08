@@ -308,55 +308,11 @@ class Export extends CI_Controller {
         
         $sheetNow = 0;
         
-        //HEADER VALUE
-        $objPHPExcel->setActiveSheetIndex($sheetNow)
-            ->setCellValue('A1', 'Laporan Presensi Per Tahun Per Bagian/Prodi')
-            ->setCellValue('A2', 'Bagian/Prodi')
-            ->setCellValue('C2', ': ' . $department_name)
-            ->setCellValue('A3', 'Tahun')
-            ->setCellValue('C3', ': ' . $year);
-
-        //HEADER CELL
-        $objPHPExcel->getActiveSheet()->mergeCells('A1:E1');
-        $objPHPExcel->getActiveSheet()->mergeCells('A2:B2');
-        $objPHPExcel->getActiveSheet()->mergeCells('A3:B3');
-        $objPHPExcel->getActiveSheet()->mergeCells('C2:E2');
-        $objPHPExcel->getActiveSheet()->mergeCells('C3:E3');
-        //HEADER STYLE
-        $objPHPExcel->getActiveSheet()->getStyle('A1:E1')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-        $objPHPExcel->getActiveSheet()->getStyle('A1:A3')->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle('C2:C3')->getFont()->setBold(true);
-        
-        $objPHPExcel->getActiveSheet()->getRowDimension('1')->setRowHeight(30);
-        
-        $objPHPExcel->getActiveSheet()->setCellValue('A5', 'BULAN');
-        $objPHPExcel->getActiveSheet()->mergeCells('A5:A7');
-        $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-        
-        $cell = 'A8';
-        for ($inc_month = 1; $inc_month <= 12; $inc_month++) {
-            $month_name = $all_month[$inc_month];
-            $objPHPExcel->getActiveSheet()->setCellValue($cell, substr($month_name,0,3));
-            $objPHPExcel->getActiveSheet()->getStyle($cell)->applyFromArray($styleThinBlackBorderOutline);
-            $objPHPExcel->getActiveSheet()->getStyle($cell)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle($cell)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle($cell)->getFont()->setBold(true);
-            $cell = $this->xls_inc($cell, 'R', 1);
-        }
-        
         $this->load->model('Personnel_model');
         $arr_prsn = $this->Personnel_model->get_all_personnel_name_by_dept_id($dept_id);
         
         /*var_dump($arr_prsn);
         exit;*/
-        
-        $cell_col_first = 'B5';
-        $cell_col = $this->xls_inc($cell_col_first,'R',1);
-        $cell = 'B6'; //INITIAL CELL
-        $num_col = 4;
         
         $this->load->model('Attendance_model');
         $ske = $this->Attendance_model->get_summary_of_keterangan_with_group($prsn_id,$year,$inc_month,TRUE);
@@ -366,14 +322,61 @@ class Export extends CI_Controller {
         }
         $dflt_col4 = substr($dflt_col4, 0, (strlen($dflt_col4) - 1));
         
-        $jml_prsn = 0;
+        $jml_prsn_in_sheet = 0;
+        $max_prsn_in_sheet = 5;
+        
+        $num_col = 4;
         
         foreach ($arr_prsn as $prsn_id => $prsn_name) {
-            
-            /*if ($sheetkeberapa > 0) {
+            if ($sheetNow > 0) {
                 $objPHPExcel->createSheet();
-            }*/
+            }
+            $jml_prsn_in_sheet++;
+            if ($jml_prsn_in_sheet == 1) {
+                //HEADER VALUE
+                $objPHPExcel->setActiveSheetIndex($sheetNow)
+                    ->setCellValue('A1', 'Laporan Presensi Per Tahun Per Bagian/Prodi')
+                    ->setCellValue('A2', 'Bagian/Prodi')
+                    ->setCellValue('C2', ': ' . $department_name)
+                    ->setCellValue('A3', 'Tahun')
+                    ->setCellValue('C3', ': ' . $year);
 
+                //HEADER CELL
+                $objPHPExcel->getActiveSheet()->mergeCells('A1:E1');
+                $objPHPExcel->getActiveSheet()->mergeCells('A2:B2');
+                $objPHPExcel->getActiveSheet()->mergeCells('A3:B3');
+                $objPHPExcel->getActiveSheet()->mergeCells('C2:E2');
+                $objPHPExcel->getActiveSheet()->mergeCells('C3:E3');
+                //HEADER STYLE
+                $objPHPExcel->getActiveSheet()->getStyle('A1:E1')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+                $objPHPExcel->getActiveSheet()->getStyle('A1:A3')->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle('C2:C3')->getFont()->setBold(true);
+
+                $objPHPExcel->getActiveSheet()->getRowDimension('1')->setRowHeight(30);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('A5', 'BULAN');
+                $objPHPExcel->getActiveSheet()->mergeCells('A5:A7');
+                $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->applyFromArray($styleThinBlackBorderOutline);
+                $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objPHPExcel->getActiveSheet()->getStyle('A5:A7')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $cell = 'A8';
+                for ($inc_month = 1; $inc_month <= 12; $inc_month++) {
+                    $month_name = $all_month[$inc_month];
+                    $objPHPExcel->getActiveSheet()->setCellValue($cell, substr($month_name,0,3));
+                    $objPHPExcel->getActiveSheet()->getStyle($cell)->applyFromArray($styleThinBlackBorderOutline);
+                    $objPHPExcel->getActiveSheet()->getStyle($cell)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    $objPHPExcel->getActiveSheet()->getStyle($cell)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                    $objPHPExcel->getActiveSheet()->getStyle($cell)->getFont()->setBold(true);
+                    $cell = $this->xls_inc($cell, 'R', 1);
+                }
+
+                $cell_col_first = 'B5';
+                $cell_col = $this->xls_inc($cell_col_first,'R',1);
+                $cell = 'B6'; //INITIAL CELL
+            }
+            
             //COL PERSONNEL NAME
             $this->load->helper('custom_string');
             $objPHPExcel->getActiveSheet()->setCellValue($cell, do_ucwords($prsn_name));
@@ -465,17 +468,32 @@ class Export extends CI_Controller {
             //NEXT COL PERSONNEL NAME
             $cell = $this->xls_inc($cell_col, 'C', $num_col);
             $cell_col = $cell;
-            $jml_prsn++;
+            
+            if ($max_prsn_in_sheet == $jml_prsn_in_sheet) {
+                $objPHPExcel->getActiveSheet()->setCellValue($cell_col_first, 'PRESENSI KARYAWAN');
+                $row_range = $cell_col_first.':'.$this->xls_inc($cell_col_first, 'C', ($num_col*$jml_prsn_in_sheet-1));
+                $objPHPExcel->getActiveSheet()->mergeCells($row_range);
+                $objPHPExcel->getActiveSheet()->getStyle($row_range)->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle($row_range)->applyFromArray($styleThinBlackBorderOutline);
+                $objPHPExcel->getActiveSheet()->getStyle($row_range)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objPHPExcel->getActiveSheet()->getStyle($row_range)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                // Rename worksheet
+                $objPHPExcel->getActiveSheet()->setTitle(($sheetNow+1).'.'.$dept_id);
+                
+                $jml_prsn_in_sheet = 0;
+                $sheetNow++;
+            }
         }
         
         $objPHPExcel->getActiveSheet()->setCellValue($cell_col_first, 'PRESENSI KARYAWAN');
-        $row_range = $cell_col_first.':'.$this->xls_inc($cell_col_first, 'C', ($num_col*$jml_prsn-1));
+        $row_range = $cell_col_first.':'.$this->xls_inc($cell_col_first, 'C', ($num_col*$jml_prsn_in_sheet-1));
         $objPHPExcel->getActiveSheet()->mergeCells($row_range);
         $objPHPExcel->getActiveSheet()->getStyle($row_range)->getFont()->setBold(true);
         $objPHPExcel->getActiveSheet()->getStyle($row_range)->applyFromArray($styleThinBlackBorderOutline);
         $objPHPExcel->getActiveSheet()->getStyle($row_range)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objPHPExcel->getActiveSheet()->getStyle($row_range)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-        
+
         // Rename worksheet
         $objPHPExcel->getActiveSheet()->setTitle(($sheetNow+1).'.'.$dept_id);
         

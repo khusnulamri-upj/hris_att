@@ -55,8 +55,10 @@ $this->load->view('template_groundwork/body_menu');
                 $mark_is_late = '';
                 $mark_is_early = '';
                 $select_ket = '';
+                $ket_libur = '';
                 if ($a->is_holiday) {
                     $mark_is_holiday = ' red-bg';
+                    $ket_libur = '<p class="half-gap-top">'.$a->desc_holiday.'</p>';
                 }
                 if ($a->is_late) {
                     $mark_is_late = ' red';
@@ -76,9 +78,20 @@ $this->load->view('template_groundwork/body_menu');
                   <div class=\"one seventh padded align-center$mark_is_holiday$mark_is_late\">$a->jam_masuk</div>
                   <div class=\"one seventh padded align-center$mark_is_holiday$mark_is_early\">$a->jam_keluar</div>
                   <div class=\"one seventh padded align-center$mark_is_holiday\">$a->waktu_telat_masuk</div>
-                  <div class=\"two seventh half-padded align-center$mark_is_holiday\">$select_ket</div>
+                  <div class=\"two seventh half-padded align-center$mark_is_holiday\">$select_ket$ket_libur</div>
                 </div>
                 ";
+                
+                /*echo "
+                <div class=\"equalize row\">
+                  <div class=\"one seventh half-padded align-center$mark_is_holiday\">$a->tanggal</div>
+                  <div class=\"one seventh half-padded align-center$mark_is_holiday\">$a->hari</div>
+                  <div class=\"one seventh half-padded align-center$mark_is_holiday$mark_is_late\">$a->jam_masuk</div>
+                  <div class=\"one seventh half-padded align-center$mark_is_holiday$mark_is_early\">$a->jam_keluar</div>
+                  <div class=\"one seventh half-padded align-center$mark_is_holiday\">$a->waktu_telat_masuk</div>
+                  <div class=\"two seventh align-center$mark_is_holiday\">$select_ket</div>
+                </div>
+                ";*/
             }
             ?>
             <div class="equalize row">

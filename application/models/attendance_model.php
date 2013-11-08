@@ -396,6 +396,46 @@ class Attendance_model extends CI_Model {
         return $return;
     }
     
+    function get_summary_of_keterangan_with_group($user_id,$tahun,$bulan,$empty_counter = FALSE,$digit_order_no = 1) {
+        if (!$empty_counter && (empty($user_id) || empty($tahun) || empty($bulan))) {
+            return NULL;
+        }
+        
+        if (!$empty_counter && !$this->is_attendance_data_exist($user_id, $tahun, $bulan)) {
+            return NULL;
+        }
+        
+        if ($empty_counter) {
+            $sql = "SELECT o.opt_keterangan_id AS id,
+                o.reff AS keterangan,
+                0 AS jumlah
+                FROM opt_keterangan o
+                GROUP BY SUBSTRING(o.order_no,1,$digit_order_no)";
+        } else {
+            $sql = "SELECT o.opt_keterangan_id AS id,
+                o.reff AS keterangan,
+                count(a.user_id) AS jumlah
+                FROM opt_keterangan o
+                LEFT OUTER JOIN (
+                    SELECT k.*
+                    FROM keterangan k
+                    WHERE k.user_id = $user_id
+                    AND k.tgl > DATE_ADD(MAKEDATE($tahun, 31), INTERVAL ($bulan-2) MONTH)
+                    AND k.tgl < DATE_ADD(MAKEDATE($tahun, 1), INTERVAL ($bulan) MONTH)
+                    AND k.expired_time IS NULL
+                ) a ON o.opt_keterangan_id = a.opt_keterangan
+                GROUP BY SUBSTRING(o.order_no,1,$digit_order_no)";
+        }
+        
+        $query = $this->db->query($sql);
+        $return = NULL;
+        if ($query->num_rows() > 0) {
+            $return = $query->result();
+        }
+        $this->db->close();
+        return $return;
+    }
+    
 }
 
 ?>

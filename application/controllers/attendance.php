@@ -172,6 +172,31 @@ class Attendance extends CI_Controller {
         $this->load->view('attendance/rpt_filter_prsn_mnth',$data);
     }
     
+    public function reportb() {
+        $this->filter_dept_year_rpt();
+    }
+    
+    var $filter_dept_year_rpt_alias = 'reportb';
+    public function filter_dept_year_rpt() {
+        $this->load->helper('custom_string');
+        $this->load->model('Department_model');
+        $data['department_option'] = get_array_value_do_ucwords($this->Department_model->get_all_department_name());
+        
+        $this->load->helper('custom_date');
+        $data['month_option'] = get_all_month_name();
+        
+        $this->load->model('Attendance_model');
+        $data['year_option'] = $this->Attendance_model->get_all_year();
+        
+        // Get any status message that may have been set.
+	$data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
+        $data['message_type'] = (! isset($this->data['message_type'])) ? $this->session->flashdata('message_type') : $this->data['message_type'];
+        
+        $data['form_action_url'] = site_url('attendance/'.$this->prsn_mnth_rpt_alias);
+        
+        $this->load->view('attendance/rpt_filter_dept_year',$data);
+    }
+    
     public function report1($personnel = NULL, $year = NULL, $month = NULL) {
         $this->prsn_mnth_rpt($personnel, $year, $month);
     }
@@ -233,10 +258,6 @@ class Attendance extends CI_Controller {
         $arr_ket[0] = '';
         $data['keterangan_option'] = $this->Attendance_model->get_all_keterangan($arr_ket);
         $this->load->view('rpt_personnel_monthly',$data);
-    }
-    
-    public function filter_dept_year_rpt() {
-        $this->load->view('layout');
     }
     
     public function department_yearly_rpt() {

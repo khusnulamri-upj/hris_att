@@ -77,7 +77,7 @@ $this->load->view('template_groundwork/body_menu');
                   <div class=\"one seventh padded align-center$mark_is_holiday\">$a->hari</div>
                   <div class=\"one seventh padded align-center$mark_is_holiday$mark_is_late\">$a->jam_masuk</div>
                   <div class=\"one seventh padded align-center$mark_is_holiday$mark_is_early\">$a->jam_keluar</div>
-                  <div class=\"one seventh padded align-center$mark_is_holiday\">$a->waktu_telat_masuk</div>
+                  <div class=\"one seventh padded align-center$mark_is_holiday$mark_is_late\">$a->waktu_telat_masuk</div>
                   <div class=\"two seventh half-padded align-center$mark_is_holiday\">$select_ket$ket_libur</div>
                 </div>
                 ";

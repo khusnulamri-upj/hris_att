@@ -135,6 +135,11 @@ class Export extends CI_Controller {
             $col4 = $a->jam_keluar;
             $col5 = $a->waktu_telat_masuk;
             $col6 = $a->keterangan;
+            if ($col6 == '') {
+                $col6 = $a->desc_holiday;
+            } else {
+                $col6 = $col6."\n".$a->desc_holiday;
+            }
             //TABLE CONTENT VALUE
             $objPHPExcel->getActiveSheet()
                 ->setCellValue($cell, $col1)                    
@@ -144,6 +149,7 @@ class Export extends CI_Controller {
                 ->setCellValue($this->xls_inc($cell, 'C', 4), $col5)   
                 ->setCellValue($this->xls_inc($cell, 'C', 5), $col6);
             //TABLE CONTENT STYLE
+            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->getAlignment()->setWrapText(true);
             $objPHPExcel->getActiveSheet()->getStyle($cell)->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 1))->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 2))->applyFromArray($styleThinBlackBorderOutline);
@@ -152,7 +158,7 @@ class Export extends CI_Controller {
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 4))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-
+            
             $cell = $this->xls_inc($cell, 'R', 1);
         }
         

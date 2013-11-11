@@ -405,7 +405,7 @@ class Attendance_model extends CI_Model {
             return NULL;
         }
         
-        if ($empty_counter) {
+        if ($empty_counter && ($user_id == 'NOTUSE') && ($tahun == 'NOTUSE') && ($bulan == 'NOTUSE')) {
             $sql = "SELECT o.opt_keterangan_id AS id,
                 o.reff AS keterangan,
                 0 AS jumlah

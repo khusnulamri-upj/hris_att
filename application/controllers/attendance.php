@@ -180,7 +180,7 @@ class Attendance extends CI_Controller {
     public function filter_dept_year_rpt() {
         $this->load->helper('custom_string');
         $this->load->model('Department_model');
-        $data['department_option'] = get_array_value_do_ucwords($this->Department_model->get_all_department_name());
+        $data['department_option'] = get_array_value_do_ucwords($this->Department_model->get_all_department_name(array('ALL' => '-- Semua Bagian/Prodi --')));
         
         $this->load->helper('custom_date');
         $data['month_option'] = get_all_month_name();
@@ -192,7 +192,7 @@ class Attendance extends CI_Controller {
 	$data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
         $data['message_type'] = (! isset($this->data['message_type'])) ? $this->session->flashdata('message_type') : $this->data['message_type'];
         
-        $data['form_action_url'] = site_url('attendance/'.$this->prsn_mnth_rpt_alias);
+        $data['form_action_url'] = site_url('attendance/'.$this->dept_year_rpt_alias);
         
         $this->load->view('attendance/rpt_filter_dept_year',$data);
     }
@@ -249,9 +249,104 @@ class Attendance extends CI_Controller {
         $this->load->view('attendance/rpt_prsn_mnth',$data);
     }
     
+    public function report2($dept = NULL, $year = NULL) {
+        $this->dept_year_rpt($dept, $year);
+    }
     
+    var $dept_year_rpt_alias = 'report2';
+    public function dept_year_rpt($dept = NULL, $year = NULL) {
+        if (($this->input->post('department') != '') && ($this->input->post('year') != '')) {
+            $dept = $this->input->post('department');
+            $year = $this->input->post('year');
+        } else if (($dept != NULL) && ($year != NULL)) {
+            $dept = $dept;
+            $year = $year;
+        } else {
+            $this->session->set_flashdata('message', 'Unable to find attendance data.');
+            $this->session->set_flashdata('message_type', 'error');
+            redirect('attendance/'.$this->filter_dept_year_rpt_alias);
+        }
+        
+        if ($dept == 'ALL') {
+            redirect('attendance/'.$this->all_dept_year_rpt_alias.'/'.$year);
+        } else {
+            redirect('export/xls_rpt_attendance_department_yearly/'.$dept.'/'.$year);
+        }
+    }
     
+    public function report2a($year = NULL) {
+        $this->all_dept_year_rpt($year);
+    }
     
+    var $all_dept_year_rpt_alias = 'report2a';
+    public function all_dept_year_rpt($year = NULL) {
+        if (empty($year)) {
+            redirect('attendance/'.$this->filter_dept_year_rpt_alias);
+        }
+        
+        $this->load->helper('custom_string');
+        //DELETE ALL FILES IN ./XLS/YDAR/
+        $this->load->helper('file');
+        delete_files($this->Parameter->get_value('FOLDER_ON_SERVER_FOR_YDAR'));
+        
+        $this->load->model('Department_model');
+        $arr_department = $this->Department_model->get_all_department_id();
+        $arr_dept_name = $this->Department_model->get_all_department_name();
+        
+        $data['arr_controllers'] = "[";
+        $data['arr_interactive'] = "[";
+        
+        foreach ($arr_department as $dept_id) {
+            $data['arr_controllers'] = $data['arr_controllers']."'".base_url('export/xls_rpt_attendance_department_yearly/'.$dept_id.'/'.$year.'/0')."',";
+            $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Creating Yearly \"".do_ucwords($arr_dept_name[$dept_id])."\" Attendance Report', after: 'Yearly \"".do_ucwords($arr_dept_name[$dept_id])."\" Attendance Report Created'},";
+        }
+        
+        $data['arr_controllers'] = $data['arr_controllers']."'".base_url('attendance/list_all_dept_year_rpt')."',";
+        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxDir', printr: 'yes'},";
+        
+        $data['arr_controllers'] = substr($data['arr_controllers'], 0, -1)."]";
+        $data['arr_interactive'] = substr($data['arr_interactive'], 0, -1)."]";
+        
+        //foreach ($arr_department as $dept_id) {
+        //    $this->xls_rpt_attendance_department_yearly($dept_id, $year, 0);
+        //}
+        $data['ajaximg'] = "' <i class=\"icon-spinner icon-spin\"></i>'";
+        
+        $this->load->view('attendance/rpt_dept_year_all',$data);
+    }
+    
+    public function list_all_dept_year_rpt() {
+        $zip = $this->Parameter->get_value('DOWNLOAD_ZIP_FOR_YDAR');
+        $this->load->helper('custom_string');
+        $this->load->helper('directory');
+        
+        $this->load->library('zip');
+        
+        $folder_ydar = $this->Parameter->get_value('FOLDER_ON_SERVER_FOR_YDAR');
+        
+        $this->load->model('Department_model');
+        $arr_dept_name = $this->Department_model->get_all_department_name();
+        
+        $map = directory_map($folder_ydar, 1);
+        
+        $ol = '<ol class="list">';
+        foreach ($map as $value) {
+            $arr_value = explode('_',$value);
+            $ol = $ol.'<li class="info"><a href="'.base_url($folder_ydar.'/'.$value).'">'.do_ucwords($arr_dept_name[substr($arr_value[0],4)]).'</a></li>';
+            if ($zip) {
+                $this->zip->read_file($folder_ydar.'/'.$value);
+            }
+        }
+        $ol = $ol."</ol>";
+        
+        echo $ol;
+        
+        //$this->zip->read_dir($folder_ydar.'/');
+        
+        if ($zip) {
+            $this->zip->archive($folder_ydar.'/YDAR'.date("YmdHisu").'.zip');
+        }
+    }
     
     public function personnel_monthly_rpt() {
         $this->load->model('Attendance_model');

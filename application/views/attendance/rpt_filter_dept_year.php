@@ -7,8 +7,8 @@ $this->load->view('template_groundwork/body_menu');
       <div class="padded">
         <div class="row">
           <div class="one whole bounceInRight animated">
-            <h3 class="zero museo-slab">Laporan Presensi Per Bulan Per Karyawan/Dosen</h3>
-            <!--<p class="quicksand">Laporan Presensi Per Bulan Per Karyawan/Dosen</p>-->
+            <h3 class="zero museo-slab">Laporan Presensi Per Tahun Per Bagian/Prodi</h3>
+            <!--<p class="quicksand">Laporan Presensi Per Tahun Per Bagian/Prodi</p>-->
           </div>
         </div>
       </div>
@@ -32,10 +32,6 @@ $this->load->view('template_groundwork/body_menu');
                 </div>
               </div>
               <div class="row">
-                <div class="two fifth padded">
-                  <label for="month">Bulan</label>
-                  <span class="select-wrap"><?php echo form_dropdown('month', isset($month_option)?$month_option:array()); ?></span>
-                </div>
                 <div class="one fifth padded">
                   <label for="year">Tahun</label>
                   <span class="select-wrap"><?php echo form_dropdown('year', isset($year_option)?$year_option:array()); ?></span>

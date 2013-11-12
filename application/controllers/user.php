@@ -32,7 +32,8 @@ class User extends CI_Controller {
 		$this->load->library('flexi_auth');	
 		
      	// Redirect users logged in via password (However, not 'Remember me' users, as they may wish to login properly).
-		if ($this->flexi_auth->is_logged_in_via_password() && uri_string() != 'user/logout') 
+		/*if ($this->flexi_auth->is_logged_in_via_password() && uri_string() != 'user/logout')*/
+                if ($this->flexi_auth->is_logged_in_via_password() && uri_string() != 'user/logout' && uri_string() != 'user/register_account') 
 		{
 			// Preserve any flashdata messages so they are passed to the redirect page.
 			if ($this->session->flashdata('message')) { $this->session->keep_flashdata('message'); }
@@ -145,7 +146,7 @@ class User extends CI_Controller {
 	 * This demo includes 3 example accounts that can be logged into via using either their email address or username. The login details are provided within the view page.
 	 * Note: This page is only accessible to users who are not currently logged in, else they will be redirected.
 	 */ 
-    function login_via_ajax()
+    /*function login_via_ajax()
     {
 		if ($this->input->is_ajax_request())
 		{
@@ -159,7 +160,7 @@ class User extends CI_Controller {
 		{
 			$this->load->view('demo/login_via_ajax_view', $this->data);
 		}
-    }
+    }*/
 
 	/**
 	 * register_account
@@ -168,13 +169,18 @@ class User extends CI_Controller {
 	 */ 
 	function register_account()
 	{
-		// Redirect user away from registration page if already logged in.
-		if ($this->flexi_auth->is_logged_in()) 
+		if (!$this->flexi_auth->is_privileged('ins_user')) {
+			$this->session->set_flashdata('message', '<p class="message dismissible error">You do not have enough privileges.</p>');
+			redirect('user');
+		}
+                // Redirect user away from registration page if already logged in.
+		/*if ($this->flexi_auth->is_logged_in())*/
+                /*if (!$this->flexi_auth->is_logged_in()) 
 		{
 			redirect('user');
 		}
 		// If 'Registration' form has been submitted, attempt to register their details as a new account.
-		else if ($this->input->post('register_user'))
+		else*/ if ($this->input->post('register_user'))
 		{			
 			$this->load->model('user_model');
 			$this->user_model->register_account();

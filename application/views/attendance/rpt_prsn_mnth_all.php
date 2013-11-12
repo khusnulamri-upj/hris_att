@@ -7,8 +7,8 @@ $this->load->view('template_groundwork/body_menu');
       <div class="padded">
         <div class="row">
           <div class="one whole bounceInRight animated">
-            <h3 class="zero museo-slab">Laporan Presensi Per Tahun Per Bagian/Prodi</h3>
-            <!--<p class="quicksand">Laporan Presensi Per Tahun Per Bagian/Prodi</p>-->
+            <h3 class="zero museo-slab">Laporan Presensi Per Bulan Per Karyawan/Dosen</h3>
+            <!--<p class="quicksand">Laporan Presensi Per Bulan Per Karyawan/Dosen</p>-->
           </div>
         </div>
       </div>

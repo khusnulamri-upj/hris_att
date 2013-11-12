@@ -76,13 +76,15 @@ class Attendance_model extends CI_Model {
         return $result;
     }
     
-    function get_attendance_data_personnel_monthly($user_id,$tahun,$bulan) {
+    function get_attendance_data_personnel_monthly($user_id,$tahun,$bulan,$bypass_for_report = FALSE) {
         if (empty($user_id) || empty($tahun) || empty($bulan)) {
             return NULL;
         }
         
         if (!$this->is_attendance_data_exist($user_id, $tahun, $bulan)) {
-            return NULL;
+            if (!$bypass_for_report) {
+                return NULL;
+            }
         }
         
         $fmt_date = '%d/%m/%Y';
@@ -364,28 +366,36 @@ class Attendance_model extends CI_Model {
         return ($row_inserted*100+$row_deleted); //AMRNOTE: FALSE == 100
     }
     
-    function get_summary_of_keterangan($user_id,$tahun,$bulan) {
-        if (empty($user_id) || empty($tahun) || empty($bulan)) {
+    function get_summary_of_keterangan($user_id,$tahun,$bulan,$empty_counter = FALSE) {
+        if (!$empty_counter && (empty($user_id) || empty($tahun) || empty($bulan))) {
             return NULL;
         }
         
-        if (!$this->is_attendance_data_exist($user_id, $tahun, $bulan)) {
+        if (!$empty_counter && !$this->is_attendance_data_exist($user_id, $tahun, $bulan)) {
             return NULL;
         }
-    
-        $sql = "SELECT o.opt_keterangan_id AS id,
-            o.content AS keterangan,
-            count(a.user_id) AS jumlah
-            FROM opt_keterangan o
-            LEFT OUTER JOIN (
-            SELECT k.*
-            FROM keterangan k
-            WHERE k.user_id = $user_id
-            AND k.tgl > DATE_ADD(MAKEDATE($tahun, 31), INTERVAL ($bulan-2) MONTH)
-            AND k.tgl < DATE_ADD(MAKEDATE($tahun, 1), INTERVAL ($bulan) MONTH)
-            AND k.expired_time IS NULL
-            ) a ON o.opt_keterangan_id = a.opt_keterangan
-            GROUP BY o.opt_keterangan_id";
+        
+        if ($empty_counter && ($user_id == 'NOTUSE') && ($tahun == 'NOTUSE') && ($bulan == 'NOTUSE')) {
+            $sql = "SELECT o.opt_keterangan_id AS id,
+                o.content AS keterangan,
+                NULL AS jumlah
+                FROM opt_keterangan o
+                GROUP BY o.opt_keterangan_id";
+        } else {
+            $sql = "SELECT o.opt_keterangan_id AS id,
+                o.content AS keterangan,
+                count(a.user_id) AS jumlah
+                FROM opt_keterangan o
+                LEFT OUTER JOIN (
+                SELECT k.*
+                FROM keterangan k
+                WHERE k.user_id = $user_id
+                AND k.tgl > DATE_ADD(MAKEDATE($tahun, 31), INTERVAL ($bulan-2) MONTH)
+                AND k.tgl < DATE_ADD(MAKEDATE($tahun, 1), INTERVAL ($bulan) MONTH)
+                AND k.expired_time IS NULL
+                ) a ON o.opt_keterangan_id = a.opt_keterangan
+                GROUP BY o.opt_keterangan_id";
+        }
          
         $query = $this->db->query($sql);
         $return = NULL;
@@ -408,7 +418,7 @@ class Attendance_model extends CI_Model {
         if ($empty_counter && ($user_id == 'NOTUSE') && ($tahun == 'NOTUSE') && ($bulan == 'NOTUSE')) {
             $sql = "SELECT o.opt_keterangan_id AS id,
                 o.reff AS keterangan,
-                0 AS jumlah
+                NULL AS jumlah
                 FROM opt_keterangan o
                 GROUP BY SUBSTRING(o.order_no,1,$digit_order_no)";
         } else {

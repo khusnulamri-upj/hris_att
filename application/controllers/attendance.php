@@ -60,6 +60,11 @@ class Attendance extends CI_Controller {
     
     var $filter_ent_alias = 'entry';
     public function filter_ent() {
+        if (!$this->flexi_auth->is_privileged('ins_ket')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         $this->load->helper('custom_string');
         $this->load->model('Personnel_model');
         $data['personnel_option'] = get_array_value_do_ucwords($this->Personnel_model->get_all_personnel_name());
@@ -85,6 +90,11 @@ class Attendance extends CI_Controller {
     
     var $personnel_ent_alias = 'entry1';
     public function personnel_ent($personnel = NULL, $year = NULL, $month = NULL) {
+        if (!$this->flexi_auth->is_privileged('ins_ket')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         $this->load->model('Attendance_model');
         $arr_ket[0] = '';
         
@@ -132,6 +142,11 @@ class Attendance extends CI_Controller {
     }
     
     public function save_ent() {
+        if (!$this->flexi_auth->is_privileged('ins_ket')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         $this->load->model('Attendance_model');
         $personnel = $this->input->post('personnel');
         $year = $this->input->post('year');
@@ -153,9 +168,14 @@ class Attendance extends CI_Controller {
     
     var $filter_prsn_mnth_rpt_alias = 'reporta';
     public function filter_prsn_mnth_rpt() {
+        if (!$this->flexi_auth->is_privileged('vw_mnth_prsn_rpt')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         $this->load->helper('custom_string');
         $this->load->model('Personnel_model');
-        $data['personnel_option'] = get_array_value_do_ucwords($this->Personnel_model->get_all_personnel_name());
+        $data['personnel_option'] = get_array_value_do_ucwords($this->Personnel_model->get_all_personnel_name(array('ALL' => '-- Semua Karyawan/Dosen --')));
         
         $this->load->helper('custom_date');
         $data['month_option'] = get_all_month_name();
@@ -178,6 +198,11 @@ class Attendance extends CI_Controller {
     
     var $filter_dept_year_rpt_alias = 'reportb';
     public function filter_dept_year_rpt() {
+        if (!$this->flexi_auth->is_privileged('vw_year_dept_rpt')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         $this->load->helper('custom_string');
         $this->load->model('Department_model');
         $data['department_option'] = get_array_value_do_ucwords($this->Department_model->get_all_department_name(array('ALL' => '-- Semua Bagian/Prodi --')));
@@ -203,6 +228,11 @@ class Attendance extends CI_Controller {
     
     var $prsn_mnth_rpt_alias = 'report1';
     public function prsn_mnth_rpt($personnel = NULL, $year = NULL, $month = NULL) {
+        if (!$this->flexi_auth->is_privileged('vw_mnth_prsn_rpt')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         $this->load->model('Attendance_model');
         $arr_ket[0] = '';
         
@@ -218,6 +248,10 @@ class Attendance extends CI_Controller {
             $this->session->set_flashdata('message', 'Unable to find attendance data.');
             $this->session->set_flashdata('message_type', 'error');
             redirect('attendance/'.$this->filter_prsn_mnth_rpt_alias);
+        }
+        
+        if ($data['personnel'] == 'ALL') {
+            redirect('attendance/'.$this->all_prsn_month_rpt_alias.'/'.$data['year'].'/'.$data['month']);
         }
         
         $data['keterangan_option'] = $this->Attendance_model->get_all_keterangan($arr_ket);
@@ -255,6 +289,11 @@ class Attendance extends CI_Controller {
     
     var $dept_year_rpt_alias = 'report2';
     public function dept_year_rpt($dept = NULL, $year = NULL) {
+        if (!$this->flexi_auth->is_privileged('vw_year_dept_rpt')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         if (($this->input->post('department') != '') && ($this->input->post('year') != '')) {
             $dept = $this->input->post('department');
             $year = $this->input->post('year');
@@ -280,6 +319,11 @@ class Attendance extends CI_Controller {
     
     var $all_dept_year_rpt_alias = 'report2a';
     public function all_dept_year_rpt($year = NULL) {
+        if (!$this->flexi_auth->is_privileged('vw_year_dept_rpt_all')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
         if (empty($year)) {
             redirect('attendance/'.$this->filter_dept_year_rpt_alias);
         }
@@ -288,6 +332,7 @@ class Attendance extends CI_Controller {
         //DELETE ALL FILES IN ./XLS/YDAR/
         $this->load->helper('file');
         delete_files($this->Parameter->get_value('FOLDER_ON_SERVER_FOR_YDAR'));
+        write_file($this->Parameter->get_value('FOLDER_ON_SERVER_FOR_YDAR').'/index.html','');
         
         $this->load->model('Department_model');
         $arr_department = $this->Department_model->get_all_department_id();
@@ -302,7 +347,7 @@ class Attendance extends CI_Controller {
         }
         
         $data['arr_controllers'] = $data['arr_controllers']."'".base_url('attendance/list_all_dept_year_rpt')."',";
-        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxDir', printr: 'yes'},";
+        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxDir', printr: 'yes', hidingdivid:'ajaxLog', hidingdiv: 'yes'},";
         
         $data['arr_controllers'] = substr($data['arr_controllers'], 0, -1)."]";
         $data['arr_interactive'] = substr($data['arr_interactive'], 0, -1)."]";
@@ -315,7 +360,60 @@ class Attendance extends CI_Controller {
         $this->load->view('attendance/rpt_dept_year_all',$data);
     }
     
+    public function report1a($year = NULL, $month = NULL) {
+        $this->all_prsn_month_rpt($year,$month);
+    }
+    
+    var $all_prsn_month_rpt_alias = 'report1a';
+    public function all_prsn_month_rpt($year = NULL, $month = NULL) {
+        if (!$this->flexi_auth->is_privileged('vw_mnth_prsn_rpt_all')) {
+            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
+            redirect('user');
+        }
+        
+        if (empty($year) || empty($month)) {
+            redirect('attendance/'.$this->filter_prsn_mnth_rpt_alias);
+        }
+        
+        $this->load->helper('custom_string');
+        //DELETE ALL FILES IN ./XLS/YDAR/
+        $this->load->helper('file');
+        delete_files($this->Parameter->get_value('FOLDER_ON_SERVER_FOR_MPAR'));
+        write_file($this->Parameter->get_value('FOLDER_ON_SERVER_FOR_MPAR').'/index.html','');
+        
+        $this->load->model('Department_model');
+        $arr_department = $this->Department_model->get_all_department_id();
+        $arr_dept_name = $this->Department_model->get_all_department_name();
+        
+        $data['arr_controllers'] = "[";
+        $data['arr_interactive'] = "[";
+        
+        foreach ($arr_department as $dept_id) {
+            $data['arr_controllers'] = $data['arr_controllers']."'".base_url('export/xls_rpt_attendance_prsn_mnth_in_dept/'.$dept_id.'/'.$year.'/'.$month)."',";
+            $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Creating Monthly Personnel In \"".do_ucwords($arr_dept_name[$dept_id])."\" Attendance Report', after: 'Monthly Personnel In \"".do_ucwords($arr_dept_name[$dept_id])."\" Attendance Report Created'},";
+        }
+        
+        $data['arr_controllers'] = $data['arr_controllers']."'".base_url('attendance/list_all_prsn_mnth_rpt')."',";
+        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxDir', printr: 'yes', hidingdivid:'ajaxLog', hidingdiv: 'yes'},";
+        
+        $data['arr_controllers'] = substr($data['arr_controllers'], 0, -1)."]";
+        $data['arr_interactive'] = substr($data['arr_interactive'], 0, -1)."]";
+        
+        //foreach ($arr_department as $dept_id) {
+        //    $this->xls_rpt_attendance_department_yearly($dept_id, $year, 0);
+        //}
+        $data['ajaximg'] = "' <i class=\"icon-spinner icon-spin\"></i>'";
+        
+        $this->load->view('attendance/rpt_prsn_mnth_all',$data);
+    }
+    
     public function list_all_dept_year_rpt() {
+        //AMRNOTE: AJAX RESPONSE
+        if (!$this->flexi_auth->is_privileged('vw_year_dept_rpt_all')) {
+            echo '<p class="message dismissible error">You do not have enough privileges.</p>';
+            exit();
+        }
+        
         $zip = $this->Parameter->get_value('DOWNLOAD_ZIP_FOR_YDAR');
         $this->load->helper('custom_string');
         $this->load->helper('directory');
@@ -331,32 +429,67 @@ class Attendance extends CI_Controller {
         
         $ol = '<ol class="list">';
         foreach ($map as $value) {
+            if (($value == 'index.html') || (substr($value,(sizeof($value)-4)) == 'zip')) {
+                continue;
+            }
             $arr_value = explode('_',$value);
             $ol = $ol.'<li class="info"><a href="'.base_url($folder_ydar.'/'.$value).'">'.do_ucwords($arr_dept_name[substr($arr_value[0],4)]).'</a></li>';
             if ($zip) {
                 $this->zip->read_file($folder_ydar.'/'.$value);
             }
         }
-        $ol = $ol."</ol>";
-        
-        echo $ol;
-        
         //$this->zip->read_dir($folder_ydar.'/');
         
         if ($zip) {
-            $this->zip->archive($folder_ydar.'/YDAR'.date("YmdHisu").'.zip');
+            $zip_name = 'YDAR'.date("YmdHis").'.zip';
+            $this->zip->archive($folder_ydar.'/'.$zip_name);
+            echo '<a href="'.base_url($folder_ydar.'/'.$zip_name).'" role="button" class="gap-bottom">Download All</a>';
         }
+        $ol = $ol."</ol>";
+        
+        echo $ol;
     }
     
-    public function personnel_monthly_rpt() {
-        $this->load->model('Attendance_model');
-        $arr_ket[0] = '';
-        $data['keterangan_option'] = $this->Attendance_model->get_all_keterangan($arr_ket);
-        $this->load->view('rpt_personnel_monthly',$data);
-    }
-    
-    public function department_yearly_rpt() {
-        $this->load->view('layout');
-    }
-
+    public function list_all_prsn_mnth_rpt() {
+        //AMRNOTE: AJAX RESPONSE
+        if (!$this->flexi_auth->is_privileged('vw_mnth_prsn_rpt_all')) {
+            echo '<p class="message dismissible error">You do not have enough privileges.</p>';
+            exit();
+        }
+        
+        $zip = $this->Parameter->get_value('DOWNLOAD_ZIP_FOR_MPAR');
+        $this->load->helper('custom_string');
+        $this->load->helper('directory');
+        
+        $this->load->library('zip');
+        
+        $folder_mpar = $this->Parameter->get_value('FOLDER_ON_SERVER_FOR_MPAR');
+        
+        $this->load->model('Department_model');
+        $arr_dept_name = $this->Department_model->get_all_department_name();
+        
+        $map = directory_map($folder_mpar, 1);
+        
+        $ol = '<ol class="list">';
+        foreach ($map as $value) {
+            if (($value == 'index.html') || (substr($value,(sizeof($value)-4)) == 'zip')) {
+                continue;
+            }
+            $arr_value = explode('_',$value);
+            $ol = $ol.'<li class="info"><a href="'.base_url($folder_mpar.'/'.$value).'">'.do_ucwords($arr_dept_name[substr($arr_value[0],4)]).'</a></li>';
+            if ($zip) {
+                $this->zip->read_file($folder_mpar.'/'.$value);
+            }
+        }
+        //$this->zip->read_dir($folder_ydar.'/');
+        
+        if ($zip) {
+            $zip_name = 'MPAR'.date("YmdHis").'.zip';
+            $this->zip->archive($folder_mpar.'/'.$zip_name);
+            echo '<a href="'.base_url($folder_mpar.'/'.$zip_name).'" role="button" class="gap-bottom">Download All</a>';
+        }
+        $ol = $ol."</ol>";
+        
+        echo $ol;
+    }    
 }

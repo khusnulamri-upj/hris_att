@@ -27,6 +27,9 @@ function fireRequest(e, t, n) {
             if (typeof t.printr !== "undefined" && typeof t.divid !== "undefined" && t.printr === "yes") {
                 $("#".concat(t.divid)).html($response);
             }
+            if (typeof t.hidingdiv !== "undefined" && typeof t.hidingdivid !== "undefined" && t.hidingdiv === "yes") {
+                $("#".concat(t.hidingdivid)).hide();
+            }
         }})
 }
 function sequenceRequest(e, t, n) {

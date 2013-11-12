@@ -237,7 +237,8 @@
 	 * 
 	 * Note: The only valid columns are the users email address (Default column name 'uacc_email') or username (Default column name'uacc_username').
 	*/ 
-	$config['database']['settings']['identity_cols'] = array('uacc_email', 'uacc_username');
+	//$config['database']['settings']['identity_cols'] = array('uacc_email', 'uacc_username');
+        $config['database']['settings']['identity_cols'] = array('uacc_email');
 	
 	/**
 	 * User Search Query Columns
@@ -280,7 +281,8 @@
 	 * Auth Session Name
 	 * Set the root auth session name saved as an array in the CI session, all other flexi auth session data is then stored within this array.
 	*/ 
-	$config['sessions']['name'] = 'flexi_auth';
+	//$config['sessions']['name'] = 'flexi_auth';
+        $config['sessions']['name'] = 'upj_auth';
 		
 	/**
 	 * Primary User Indentifier Session
@@ -398,7 +400,8 @@
 	 *   There are then functions within the library to check whether a user is logged in via entering a password, or via a cookie - typically sensitive data should 
 	 *   only be available to users logged in via a password, and less sensitive data to users logged in via 'Remember me' cookies.
 	*/
-	$config['security']['login_session_expire'] = 60*60*3;
+	//$config['security']['login_session_expire'] = 60*60*3;
+        $config['security']['login_session_expire'] = 60*5;
 	
 	/**
 	 * Set whether a users login time is extended when their session token is validated (On every page load).

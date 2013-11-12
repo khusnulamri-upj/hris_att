@@ -147,7 +147,7 @@ class Members extends CI_Controller {
  	 * The purpose of verification via email ensures that a user enters their correct email address. If they were to unknowingly mispell the address, the next time
  	 * they tried to login to site, their email address would no longer be recognised, and they would then be completely locked out of their account.
  	 */
-	function update_email($user_id = FALSE, $token = FALSE)
+	/*function update_email($user_id = FALSE, $token = FALSE)
 	{
 		$this->load->model('user_model');
 
@@ -176,7 +176,7 @@ class Members extends CI_Controller {
 		{
 			redirect('auth/login');
 		}
-	}
+	}*/
 	
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
 	// Manage Address Book
@@ -187,7 +187,7 @@ class Members extends CI_Controller {
  	 * Manage and update the address book of the logged in public user.
  	 * This page is simply an example of using the auth library to save miscellaneous user details to the database and then linking them to the auth user profile.
  	 */
-	function manage_address_book()
+	/*function manage_address_book()
 	{
 		// If 'Address Book' form has been submitted, then delete any checkbox checked address details.
 		if ($this->input->post('update_addresses')) 
@@ -209,14 +209,14 @@ class Members extends CI_Controller {
 		$this->data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
 		
 		$this->load->view('demo/public_examples/address_view', $this->data);		
-	}
+	}*/
 	
  	/**
  	 * insert_address
  	 * Insert a new address to the logged in public users address book.
  	 * This page is simply an example of using the auth library to save miscellaneous user details to the database and then linking them to the auth user profile.
  	 */
-	function insert_address()
+	/*function insert_address()
 	{
 		// If 'Add Address' form has been submitted, then insert the new address details to the logged in users address book.
 		if ($this->input->post('insert_address')) 
@@ -229,14 +229,14 @@ class Members extends CI_Controller {
 		$this->data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
 		
 		$this->load->view('demo/public_examples/address_insert_view', $this->data);		
-	}
+	}*/
 
  	/**
  	 * update_address
  	 * Update an existing address from the logged in public users address book.
  	 * This page is simply an example of using the auth library to save miscellaneous user details to the database and then linking them to the auth user profile.
  	 */
-	function update_address($address_id = FALSE)
+	/*function update_address($address_id = FALSE)
 	{
 		// Check the url parameter is a valid address id, else redirect to the dashboard.
 		if (! is_numeric($address_id))
@@ -259,7 +259,7 @@ class Members extends CI_Controller {
 		$this->data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
 		
 		$this->load->view('demo/public_examples/address_update_view', $this->data);		
-	}
+	}*/
 }
 	
 /* End of file auth_public.php */

@@ -142,7 +142,8 @@ class User_model extends CI_Model {
 			
 			// Set whether to instantly activate account.
 			// This var will be used twice, once for registration, then to check if to log the user in after registration.
-			$instant_activate = FALSE;
+			//$instant_activate = FALSE;
+                        $instant_activate = TRUE;
 	
 			// The last 2 variables on the register function are optional, these variables allow you to:
 			// #1. Specify the group ID for the user to be added to (i.e. 'Moderator' / 'Public'), the default is set via the config file.

@@ -7,8 +7,8 @@ $this->load->view('template_groundwork/body_menu');
       <div class="padded">
         <div class="row">
           <div class="one whole bounceInRight animated">
-            <h3 class="zero museo-slab">Update Account Details</h3>
-            <!--<p class="quicksand">Update Account Details</p>-->
+            <h3 class="zero museo-slab">Account Registration</h3>
+            <!--<p class="quicksand">Account Registration</p>-->
           </div>
         </div>
       </div>

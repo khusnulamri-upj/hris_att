@@ -7,23 +7,26 @@ class Parameter extends CI_Model {
     function __construct() {
         // Call the Model constructor
         parent::__construct();
-        $this->load->database();
     }
 
     function get_value($name, $type = 'VARIABLE') {
+        $db_dflt = $this->load->database('default',TRUE);
+        
         $id = strtoupper($name);
         $sql = "SELECT value
             FROM parameter
             WHERE type = '$type'
                 AND name = '$id'
             LIMIT 1";
-        $query = $this->db->query($sql);
+        $query = $db_dflt->query($sql);
         $row = $query->row();
         if (isset($row)) {
             return $row->value;
         } else {
             return NULL;
         }
+        
+        $db_dflt->close();
     }
 
 }

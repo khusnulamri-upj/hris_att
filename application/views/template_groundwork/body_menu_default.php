@@ -11,6 +11,7 @@
                         <li><a href="<?php echo site_url('attendance/reportb')?>" title="Laporan Presensi Per Tahun Per Bagian/Prodi">Per Tahun Per Bagian/Prodi</a></li>
                     </ul>
                 </li>
+                <li><a href="<?php echo site_url('import')?>" title="Transfer Data To Server">Transfer Data</a></li>
               </ul>
             </li>
             <li role="menu">
@@ -20,6 +21,7 @@
                 <li><a href="<?php echo base_url('members/change_password')?>" title="Update Password">Update Password</a></li>
               </ul>
             </li>
+            <?php if (!$this->flexi_auth->in_group('Staf HRD')) { ?>
             <li role="menu">
               <button title="Members Area">Admin Area</button>
               <ul>
@@ -52,6 +54,7 @@
                 <li><a href="<?php echo base_url('groundwork')?>/docs/animations.html" title="Pure CSS3 Animations">Animations</a></li>
               </ul>
             </li>
+            <?php } ?>
           </ul>
         </nav>
       </div>

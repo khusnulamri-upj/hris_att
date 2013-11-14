@@ -54,7 +54,6 @@ class Import extends CI_Controller {
             $data = array('app_log' => 'LOGIN REQUIRED : clean_directory');
             $this->session->set_userdata($data);
         } else {
-          
             $this->load->helper('file');
             //$targetDir = base_url('files/mdb');
             //'./files/mdb/';

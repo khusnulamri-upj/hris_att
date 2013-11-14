@@ -87,11 +87,18 @@ class Attendance_model extends CI_Model {
             }
         }
         
-        $fmt_date = '%d/%m/%Y';
+        /*$fmt_date = '%d/%m/%Y';
         $fmt_time = '%H:%i';
         $late_limit = '07:40';
         $early_limit = '16:30';
-        $time_divider = '12:00';
+        $time_divider = '12:00';*/
+        
+        $fmt_date = $this->Parameter->get_value('FORMAT_TGL');
+        $fmt_time = $this->Parameter->get_value('FORMAT_JAM');
+        $late_limit = $this->Parameter->get_value('JAM_MASUK');
+        $early_limit = $this->Parameter->get_value('JAM_KELUAR');
+        $time_divider = $this->Parameter->get_value('JAM_TENGAH');
+        
         
         $this->load->database('default');
         
@@ -209,11 +216,17 @@ class Attendance_model extends CI_Model {
             return NULL;
         }
         
-        $fmt_date = '%d/%m/%Y';
+        /*$fmt_date = '%d/%m/%Y';
         $fmt_time = '%H:%i';
         $late_limit = '07:40';
         $early_limit = '16:30';
-        $time_divider = '12:00';
+        $time_divider = '12:00';*/
+        
+        $fmt_date = $this->Parameter->get_value('FORMAT_TGL');
+        $fmt_time = $this->Parameter->get_value('FORMAT_JAM');
+        $late_limit = $this->Parameter->get_value('JAM_MASUK');
+        $early_limit = $this->Parameter->get_value('JAM_KELUAR');
+        $time_divider = $this->Parameter->get_value('JAM_TENGAH');
         
         $this->load->database('default');
         
@@ -298,9 +311,8 @@ class Attendance_model extends CI_Model {
         return $return;
     }
     
-    
     function insert_keterangan($user_id,$tahun,$bulan,$arr_ket) {
-        $current_user_id = $this->flexi_auth->get_user_id();
+        $current_logged_in_user = $this->flexi_auth->get_user_id();
         
         $tbl = 'keterangan';
         $col_user_id = 'user_id';
@@ -326,7 +338,7 @@ class Attendance_model extends CI_Model {
 
                     $str = "UPDATE $tbl
                         SET expired_time = CURRENT_TIMESTAMP,
-                        modified_by = $current_user_id
+                        modified_by = $current_logged_in_user
                         WHERE expired_time IS NULL AND $col_user_id = $user_id
                         AND $col_tanggal = DATE_ADD(MAKEDATE($tahun, $key), INTERVAL ($bulan-1) MONTH)";
 
@@ -335,7 +347,7 @@ class Attendance_model extends CI_Model {
                     $data_mysql = array(
                         $col_user_id => $user_id,
                         $col_opt_keterangan => $value,
-                        'created_by' => $current_user_id
+                        'created_by' => $current_logged_in_user
                     );
 
                     $this->db->set($col_tanggal, 'DATE_ADD(MAKEDATE('.$tahun.', '.$key.'), INTERVAL ('.$bulan.'-1) MONTH)', FALSE);
@@ -353,7 +365,7 @@ class Attendance_model extends CI_Model {
                 if ($querycek->num_rows > 0) {
                     $str = "UPDATE $tbl
                         SET expired_time = CURRENT_TIMESTAMP,
-                        modified_by = $current_user_id
+                        modified_by = $current_logged_in_user
                         WHERE expired_time IS NULL AND $col_user_id = $user_id
                         AND $col_tanggal = DATE_ADD(MAKEDATE($tahun, $key), INTERVAL ($bulan-1) MONTH)";
 

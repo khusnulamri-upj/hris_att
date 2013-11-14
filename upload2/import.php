@@ -39,27 +39,28 @@ class Import extends CI_Controller {
         }
 
         // Note: This is only included to create base urls for purposes of this demo only and are not necessarily considered as 'Best practice'.
-        $this->load->vars('base_url', 'http://localhost/hris_att/');
-        $this->load->vars('includes_dir', 'http://localhost/hris_att/includes/');
+        $this->load->vars('base_url', 'http://server.upj/presensi2/');
+        $this->load->vars('includes_dir', 'http://server.upj/presensi2/includes/');
         $this->load->vars('current_url', $this->uri->uri_to_assoc(1));
 
         // Define a global variable to store data that is then used by the end view page.
         $this->data = null;
     }
     
-    //public function index() {
+    public function index() {
         //INTERFACE
         /*if (!$this->flexi_auth->is_privileged('imp_mdb')) {
             $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
             redirect('user');
         }*/
         
-        /*f(file_exists($this->Parameter->get_value('FILE_ON_LOCAL_FOR_MDB'))) {
+        if(file_exists($this->Parameter->get_value('FILE_ON_LOCAL_FOR_MDB'))) {
             $data['file_is_exist'] = '<p class="message success">MDB Files is exist on local computer.</p></br>';
             $data['button_disabled'] = '';
         } else {
             $data['file_is_exist'] = '<p class="message warning">MDB Files is not on local computer.</p></br>';
-            $data['button_disabled'] = ' disabled="disabled"';
+            /*$data['button_disabled'] = ' disabled="disabled"';*/
+            $data['button_disabled'] = '';
         }
         
         $data['arr_controllers'] = "[";
@@ -82,8 +83,8 @@ class Import extends CI_Controller {
         $this->load->view('attendance/import_vw',$data);
     }
     
-    public function mdb_transfer() {
-        //TO SERVER VIA FTP
+    /*public function mdb_transfer() {
+        //TO SERVER VIA FTP (FAILED)
         $this->load->library('ftp');
         
         $config['hostname'] = $this->Parameter->get_value('FTP_HOSTNAME_FOR_MDB');
@@ -100,60 +101,6 @@ class Import extends CI_Controller {
 
         $this->ftp->close();
     }*/
-    
-    public function index() {
-        //INTERFACE
-        /*if (!$this->flexi_auth->is_privileged('imp_mdb')) {
-            $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
-            redirect('user');
-        }*/
-        
-        /*if(file_exists($this->Parameter->get_value('FILE_ON_LOCAL_FOR_MDB'))) {
-            $data['file_is_exist'] = '<p class="message success">MDB Files is exist on local computer.</p></br>';
-            $data['button_disabled'] = '';
-        } else {
-            $data['file_is_exist'] = '<p class="message warning">MDB Files is not on local computer.</p></br>';
-            $data['button_disabled'] = ' disabled="disabled"';
-        }
-        
-        $data['arr_controllers'] = "[";
-        $data['arr_interactive'] = "[";
-        
-        $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_transfer')."',";
-        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Transferring MDB Data To Server', after: 'Transferring MDB Data Finished'},";
-        
-        $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_get_data')."',";
-        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Importing MDB Data To Database', after: 'Importing MDB Data Finished'},";
-        
-        $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_process_data')."',";
-        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Processing MDB Data', after: 'Processing MDB Data Finished'},";
-        
-        $data['arr_controllers'] = substr($data['arr_controllers'], 0, -1)."]";
-        $data['arr_interactive'] = substr($data['arr_interactive'], 0, -1)."]";
-        
-        $data['ajaximg'] = "' <i class=\"icon-spinner icon-spin\"></i>'";*/
-        
-        $this->load->view('attendance/import_vw_plupload',$data);
-    }
-    
-    public function mdb_transfer() {
-        //TO SERVER VIA FTP
-        $this->load->library('ftp');
-        
-        $config['hostname'] = $this->Parameter->get_value('FTP_HOSTNAME_FOR_MDB');
-        $config['username'] = $this->Parameter->get_value('FTP_USERNAME_FOR_MDB');
-        $config['password'] = $this->Parameter->get_value('FTP_PASSWORD_FOR_MDB');
-        $config['debug'] = TRUE;
-
-        $this->ftp->connect($config);
-        
-        if(file_exists($this->Parameter->get_value('REMOTE_FILE_ON_SERVER_FOR_MDB'))) {
-            $this->ftp->delete_file($this->Parameter->get_value('REMOTE_FILE_ON_SERVER_FOR_MDB'));
-        }
-        $this->ftp->upload($this->Parameter->get_value('FILE_ON_LOCAL_FOR_MDB'), $this->Parameter->get_value('REMOTE_FILE_ON_SERVER_FOR_MDB'));
-
-        $this->ftp->close();
-    }
     
     public function mdb_get_data() {
         //TO DB TEMPORARY

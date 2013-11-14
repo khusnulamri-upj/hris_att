@@ -192,6 +192,7 @@
   padding: 1em;
   line-height: 1.8em;
   overflow: auto;
+  overflow-x: hidden;
   position: relative;
 }
 

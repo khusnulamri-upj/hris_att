@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 // Settings
 //$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
-$targetDir = '..'. DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'assets'. DIRECTORY_SEPARATOR .'mdb';
+$targetDir = '..'. DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'assets';
 $cleanupTargetDir = true; // Remove old files
 $maxFileAge = 5 * 3600; // Temp file age in seconds
 
@@ -60,6 +60,11 @@ if (isset($_REQUEST["name"])) {
 //$filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
 $fileName = 'import.mdb';
 $filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+
+//AMR: Delete Files
+if (file_exists($filePath)) {
+	@unlink($filePath);
+}
 
 // Chunking might be enabled
 $chunk = isset($_REQUEST["chunk"]) ? intval($_REQUEST["chunk"]) : 0;

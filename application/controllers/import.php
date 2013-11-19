@@ -108,7 +108,7 @@ class Import extends CI_Controller {
             redirect('user');
         }*/
         
-        /*if(file_exists($this->Parameter->get_value('FILE_ON_LOCAL_FOR_MDB'))) {
+        if(file_exists($this->Parameter->get_value('FILE_ON_LOCAL_FOR_MDB'))) {
             $data['file_is_exist'] = '<p class="message success">MDB Files is exist on local computer.</p></br>';
             $data['button_disabled'] = '';
         } else {
@@ -119,8 +119,8 @@ class Import extends CI_Controller {
         $data['arr_controllers'] = "[";
         $data['arr_interactive'] = "[";
         
-        $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_transfer')."',";
-        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Transferring MDB Data To Server', after: 'Transferring MDB Data Finished'},";
+        /*$data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_transfer')."',";
+        $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Transferring MDB Data To Server', after: 'Transferring MDB Data Finished'},";*/
         
         $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_get_data')."',";
         $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Importing MDB Data To Database', after: 'Importing MDB Data Finished'},";
@@ -131,12 +131,12 @@ class Import extends CI_Controller {
         $data['arr_controllers'] = substr($data['arr_controllers'], 0, -1)."]";
         $data['arr_interactive'] = substr($data['arr_interactive'], 0, -1)."]";
         
-        $data['ajaximg'] = "' <i class=\"icon-spinner icon-spin\"></i>'";*/
+        $data['ajaximg'] = "' <i class=\"icon-spinner icon-spin\"></i>'";
         
         $this->load->view('attendance/import_vw_plupload',$data);
     }
     
-    public function mdb_transfer() {
+    /*public function mdb_transfer() {
         //TO SERVER VIA FTP
         $this->load->library('ftp');
         
@@ -153,7 +153,7 @@ class Import extends CI_Controller {
         $this->ftp->upload($this->Parameter->get_value('FILE_ON_LOCAL_FOR_MDB'), $this->Parameter->get_value('REMOTE_FILE_ON_SERVER_FOR_MDB'));
 
         $this->ftp->close();
-    }
+    }*/
     
     public function mdb_get_data() {
         //TO DB TEMPORARY

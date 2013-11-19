@@ -53,7 +53,7 @@ $this->load->view('template_groundwork/body_menu');
         runtimes : 'html5,flash,silverlight,html4',
         browse_button : 'pickfiles', // you can pass in id...
         container: document.getElementById('containerfiles'), // ... or DOM Element itself
-        url : '<?= base_url('assets/plupload/examples') ?>/upload.php',
+        url : '<?= base_url('assets/plupload') ?>/upload.php',
         flash_swf_url : '<?= base_url('assets/plupload') ?>/js/Moxie.swf',
         silverlight_xap_url : '<?= base_url('assets/plupload') ?>/js/Moxie.xap',
 
@@ -87,15 +87,19 @@ $this->load->view('template_groundwork/body_menu');
 
                 FilesAdded: function(up, files) {
                         plupload.each(files, function(file) {
-                                document.getElementById('filelist').innerHTML += '<div id="' + file.id + '"> File ' + file.name + ' (' + plupload.formatSize(file.size) + ') selected <br/><span></span></div>';
+                            $("#ajaxLog").children("ol").append("<li id=\"fileNow\">".concat("File ".concat(file.name).concat("(".concat(plupload.formatSize(file.size)).concat(") ")).concat("selected")).concat("</li>"));
+                            $("#ajaxLog").scrollTop($("#ajaxLog").prop("scrollHeight"));
                         });
                 },
 
                 UploadProgress: function(up, file) {
-                        document.getElementById(file.id).getElementsByTagName('span')[0].innerHTML = 'Uploading File [' + file.percent + "%]";
+                        $("#ajaxNow").remove();
+                        $("#ajaxLog").children("ol").append("<li id=\"ajaxNow\">".concat("Uploading File ".concat(file.name).concat(" ").concat(file.percent).concat("%")).concat("</li>"));
+                        $("#ajaxLog").scrollTop($("#ajaxLog").prop("scrollHeight"));
                 },
 
                 Error: function(up, err) {
+                        $("#ajaxNow").remove();
                         document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;
                 }
         }
@@ -109,21 +113,16 @@ $this->load->view('template_groundwork/body_menu');
         if ( up.files.length > 1 && uploader.state != 2) {
             up.removeFile(up.files[0]);
             up.refresh();
-            document.getElementById('filelist').innerHTML = '';
+            $("#fileNow").remove();
         }
     });
 
     uploader.bind('FileUploaded', function(up, file) {
         //if (file.percent == 100) {
-            document.getElementById(file.id).getElementsByTagName('span')[0].innerHTML = 'File Uploaded';
-            importMdb();
+            $("#ajaxNow").remove();
+            $("#ajaxLog").children("ol").append("<li>".concat("File ".concat(file.name).concat(" Uploaded")).concat("</li>"));
+            aj();
         //}
-    });
-
-    $.ajax({
-        type: "POST",
-        data: "MDB",
-        url: "<?= site_url("/import/clean_directory"); ?>"
     });
 
     </script>

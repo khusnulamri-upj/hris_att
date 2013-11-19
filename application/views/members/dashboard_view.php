@@ -8,11 +8,11 @@ $this->load->view('template_groundwork/body_menu');
         <div class="one whole padded bounceInLeft animated">
           <div class="row white box">
             <div class="three-up two-up-small-tablet padded">
-              <h4 class="zero"><i class="icon-th icon-2x gap-right"></i> Grid System</h4>
-              <p>A highly configurable, nestable, fractions-based, responsive & adaptive, fluid grid layout system</p>
+              <h4 class="zero"><i class="icon-keyboard icon-2x gap-right"></i> Input Presensi</h4>
+              <p>Input keterangan (sakit/ijin/cuti) pada daftar presensi masing-masing karyawan</p>-->
             </div>
             <div class="three-up two-up-small-tablet padded">
-              <h4 class="zero"><i class="icon-tablet icon-2x gap-right"></i> Works Everywhere</h4>
+              <h4 class="zero"><i class="icon-book icon-2x gap-right"></i> Works Everywhere</h4>
               <p>Works on virtually everything &mdash; mobile phones, tablets, notebooks, desktops, retina and big screens</p>
             </div>
             <div class="three-up two-up-small-tablet padded">

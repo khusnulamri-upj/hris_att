@@ -551,6 +551,111 @@ class Attendance_model extends CI_Model {
         return $return;
     }
     
+    function get_attendance_data_on_date($tahun,$bulan,$tanggal) {
+        if (empty($tahun) || empty($bulan) || empty($tanggal)) {
+            return NULL;
+        }
+        
+        /*if (!$this->is_attendance_data_exist($user_id, $tahun, $bulan)) {
+            return NULL;
+        }*/
+        
+        /*$fmt_date = '%d/%m/%Y';
+        $fmt_time = '%H:%i';
+        $late_limit = '07:40';
+        $early_limit = '16:30';
+        $time_divider = '12:00';*/
+        
+        $fmt_date = $this->Parameter->get_value('FORMAT_TGL');
+        $fmt_time = $this->Parameter->get_value('FORMAT_JAM');
+        $late_limit = $this->Parameter->get_value('JAM_MASUK');
+        $early_limit = $this->Parameter->get_value('JAM_KELUAR');
+        $time_divider = $this->Parameter->get_value('JAM_TENGAH');
+        
+        $this->load->database('default');
+        
+        $sql = "SELECT u.user_id,
+            u.name,
+            u.default_dept_id,
+            d.dept_id,
+            d.dept_name,
+            aa.tanggal,
+            aa.user_id,
+            aa.jam_masuk,
+            aa.is_late,
+            aa.detik_telat_masuk,
+            aa.jam_keluar,
+            aa.is_early,
+            aa.opt_keterangan,
+            o.content AS keterangan
+            FROM userinfo u
+            LEFT OUTER JOIN
+            (
+              SELECT att.user_id,
+              att.tanggal,
+              att.is_same,
+              att.jam_masuk,
+              att.jam_keluar,
+              att.is_late,
+              att.detik_telat_masuk,
+              att.is_early,
+              MAX(att.opt_keterangan) AS opt_keterangan
+              FROM (
+                SELECT aa.user_id,
+                aa.tanggal,
+                aa.is_same,
+                DATE_FORMAT(aa.enter_time,'$fmt_time') AS jam_masuk,
+                DATE_FORMAT(aa.leave_time,'$fmt_time') AS jam_keluar,
+                IF(aa.enter_time > '$late_limit', 1, 0) AS is_late,
+                TIME_TO_SEC(IF(TIMEDIFF(DATE_FORMAT(aa.enter_time,'$fmt_time'),'$late_limit') > 0, TIMEDIFF(DATE_FORMAT(aa.enter_time,'$fmt_time'),'$late_limit'), NULL)) AS detik_telat_masuk,
+                IF(aa.leave_time < '$early_limit', 1, 0) AS is_early,
+                NULL AS opt_keterangan
+                FROM (
+                  SELECT a.user_id,
+                  DATE_FORMAT(a.date,'$fmt_date') AS tanggal,
+                  IF(a.max_time = a.min_time,IF(TIMEDIFF(DATE_FORMAT(a.min_time,'$fmt_time'),'$time_divider') >= 0,NULL,a.min_time),a.min_time) AS enter_time,
+                  IF(a.max_time = a.min_time,IF(TIMEDIFF('$time_divider',DATE_FORMAT(a.max_time,'$fmt_time')) > 0,NULL,a.max_time),a.max_time) AS leave_time,
+                  IF(a.max_time = a.min_time,1,0) AS is_same
+                  FROM attendance a
+                  WHERE a.date = MAKEDATE(2013, 267)
+                ) aa
+                UNION
+                SELECT k.user_id,
+                DATE_FORMAT(k.tgl,'$fmt_date') AS tanggal,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                k.opt_keterangan
+                FROM keterangan k
+                LEFT OUTER JOIN opt_keterangan o
+                ON k.opt_keterangan = o.opt_keterangan_id
+                WHERE k.expired_time IS NULL
+                AND k.tgl = MAKEDATE(2013, 267)
+              ) att
+              GROUP BY att.user_id
+            ) aa
+            ON u.user_id = aa.user_id
+            LEFT OUTER JOIN department d
+            ON u.default_dept_id = d.dept_id
+            LEFT OUTER JOIN opt_keterangan o
+            ON aa.opt_keterangan = o.opt_keterangan_id
+            WHERE
+            u.default_dept_id LIKE '%'
+            ORDER BY u.name ASC";
+        
+        //$query = $this->db->query($sql, array($fmt_date, (integer)$bulan, (integer)$tahun, (integer)$user_id, (integer)$user_id));
+        $query = $this->db->query($sql);
+        $return = NULL;
+        if ($query->num_rows() > 1) {
+            $return = $query->row();
+        }
+        $this->db->close();
+        return $return;
+    }
+    
 }
 
 ?>

@@ -7,6 +7,7 @@
                 <li role="menu">
                     <button title="Laporan Presensi Karyawan/Dosen">Laporan Presensi</button>
                     <ul>
+                        <li><a href="<?php echo site_url('attendance/reportc')?>" title="Laporan Presensi Per Hari">Per Tanggal</a></li>
                         <li><a href="<?php echo site_url('attendance/reporta')?>" title="Laporan Presensi Per Bulan Per Karyawan/Dosen">Per Bulan Per Karyawan/Dosen</a></li>
                         <li><a href="<?php echo site_url('attendance/reportb')?>" title="Laporan Presensi Per Tahun Per Bagian/Prodi">Per Tahun Per Bagian/Prodi</a></li>
                     </ul>

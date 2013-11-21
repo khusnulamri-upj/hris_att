@@ -52,7 +52,7 @@ if (!function_exists('get_month_name')) {
                 $arr_month[$i] = date("F", mktime(0, 0, 0, 1, $i, date("Y")));
             }
         }
-        return $arr_month[$month_id];
+        return $arr_month[intval($month_id)];
     }
 
 }

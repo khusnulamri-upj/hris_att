@@ -551,7 +551,7 @@ class Attendance_model extends CI_Model {
         return $return;
     }
     
-    function get_attendance_data_on_date($tahun,$bulan,$tanggal) {
+    function get_attendance_data_on_date($tahun,$bulan,$tanggal,$department = array()) {
         if (empty($tahun) || empty($bulan) || empty($tanggal)) {
             return NULL;
         }
@@ -566,6 +566,17 @@ class Attendance_model extends CI_Model {
         $early_limit = '16:30';
         $time_divider = '12:00';*/
         
+        $filter_default_dept_id = "";
+        if ($department != array()) {
+            $filter_default_dept_id = "IN (";
+            foreach ($department as $key => $value) {
+                $filter_default_dept_id = $filter_default_dept_id."$key,";
+            }
+            $filter_default_dept_id = substr($filter_default_dept_id, 0, -1).")";
+        } else {
+            $filter_default_dept_id = "LIKE '%'";
+        }
+            
         $fmt_date = $this->Parameter->get_value('FORMAT_TGL');
         $fmt_time = $this->Parameter->get_value('FORMAT_JAM');
         $late_limit = $this->Parameter->get_value('JAM_MASUK');
@@ -575,17 +586,18 @@ class Attendance_model extends CI_Model {
         $this->load->database('default');
         
         $sql = "SELECT u.user_id,
-            u.name,
+            u.name AS nama,
             u.default_dept_id,
             d.dept_id,
-            d.dept_name,
+            d.dept_name AS dept_name,
             aa.tanggal,
             aa.user_id,
-            aa.jam_masuk,
-            aa.is_late,
+            aa.jam_masuk AS jam_masuk,
+            aa.is_late AS is_late,
             aa.detik_telat_masuk,
-            aa.jam_keluar,
-            aa.is_early,
+            TIME_FORMAT(SEC_TO_TIME(aa.detik_telat_masuk),'$fmt_time') AS waktu_telat_masuk,
+            aa.jam_keluar AS jam_keluar,
+            aa.is_early AS is_early,
             aa.opt_keterangan,
             o.content AS keterangan
             FROM userinfo u
@@ -617,7 +629,7 @@ class Attendance_model extends CI_Model {
                   IF(a.max_time = a.min_time,IF(TIMEDIFF('$time_divider',DATE_FORMAT(a.max_time,'$fmt_time')) > 0,NULL,a.max_time),a.max_time) AS leave_time,
                   IF(a.max_time = a.min_time,1,0) AS is_same
                   FROM attendance a
-                  WHERE a.date = MAKEDATE(2013, 267)
+                  WHERE a.date = DATE_ADD(MAKEDATE($tahun, $tanggal), INTERVAL ($bulan-1) MONTH)
                 ) aa
                 UNION
                 SELECT k.user_id,
@@ -633,7 +645,7 @@ class Attendance_model extends CI_Model {
                 LEFT OUTER JOIN opt_keterangan o
                 ON k.opt_keterangan = o.opt_keterangan_id
                 WHERE k.expired_time IS NULL
-                AND k.tgl = MAKEDATE(2013, 267)
+                AND k.tgl = DATE_ADD(MAKEDATE($tahun, $tanggal), INTERVAL ($bulan-1) MONTH)
               ) att
               GROUP BY att.user_id
             ) aa
@@ -643,14 +655,14 @@ class Attendance_model extends CI_Model {
             LEFT OUTER JOIN opt_keterangan o
             ON aa.opt_keterangan = o.opt_keterangan_id
             WHERE
-            u.default_dept_id LIKE '%'
+            u.default_dept_id $filter_default_dept_id
             ORDER BY u.name ASC";
         
         //$query = $this->db->query($sql, array($fmt_date, (integer)$bulan, (integer)$tahun, (integer)$user_id, (integer)$user_id));
         $query = $this->db->query($sql);
         $return = NULL;
         if ($query->num_rows() > 1) {
-            $return = $query->row();
+            $return = $query->result();
         }
         $this->db->close();
         return $return;

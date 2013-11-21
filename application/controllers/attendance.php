@@ -506,19 +506,23 @@ class Attendance extends CI_Controller {
             redirect('user');
         }
         
+        $this->load->helper('custom_date');
+        $arr_month = get_all_month_name();
+        $data['month_array'] = '[';
+        foreach ($arr_month as $m) {
+            $data['month_array'] = $data['month_array'].'\''.$m.'\',';
+        }
+        $data['month_array'] = substr($data['month_array'], 0, -1)."]";
+        
         $this->load->helper('custom_string');
-        $this->load->model('Personnel_model');
         $this->load->model('Department_model');
         $data['department'] = get_array_value_do_ucwords($this->Department_model->get_all_department_name());
-        
-        $this->load->model('Attendance_model');
-        $data['year_option'] = $this->Attendance_model->get_all_year();
         
         // Get any status message that may have been set.
 	$data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];
         $data['message_type'] = (! isset($this->data['message_type'])) ? $this->session->flashdata('message_type') : $this->data['message_type'];
         
-        $data['form_action_url'] = site_url('attendance/'.$this->prsn_mnth_rpt_alias);
+        $data['form_action_url'] = site_url('attendance/'.$this->daily_rpt_alias);
         
         $this->load->view('attendance/rpt_filter_daily',$data);
     }
@@ -528,7 +532,7 @@ class Attendance extends CI_Controller {
     }
     
     var $daily_rpt_alias = 'report3';
-    public function daily_rpt($year = NULL, $month = NULL, $tanggal = NULL) {
+    public function daily_rpt() {
         if (!$this->flexi_auth->is_privileged('vw_daily_rpt')) {
             $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
             redirect('user');
@@ -537,21 +541,24 @@ class Attendance extends CI_Controller {
         $this->load->model('Attendance_model');
         $arr_ket[0] = '';
         
-        if (($this->input->post('year') != '') && ($this->input->post('month') != '') && ($this->input->post('tanggal') != '')) {
-            $data['year'] = $this->input->post('year');
-            $data['month'] = $this->input->post('month');
+        if (($this->input->post('tanggal') != '') && ($this->input->post('department') != '')) {
             $data['tanggal'] = $this->input->post('tanggal');
-        } else if (($year != NULL) && ($month != NULL) && ($tanggal != NULL) ) {
-            $data['year'] = $year;
-            $data['month'] = $month;
-            $data['tanggal'] = $tanggal;
+            $data['department'] = $this->input->post('department');
         } else {
             $this->session->set_flashdata('message', 'Unable to find attendance data.');
             $this->session->set_flashdata('message_type', 'error');
             redirect('attendance/'.$this->filter_daily_rpt_alias);
         }
         
-        $data['attendance'] = $this->Attendance_model->get_attendance_data_personnel_monthly($data['personnel'],$data['year'],$data['month']);
+        $arr_temp = explode(',', $data['tanggal']);
+        $str_tgl = $arr_temp[1];
+        $arr_tgl = explode('/', $str_tgl);
+        $tahun = $arr_tgl[2];
+        $bulan = intval($arr_tgl[1]);
+        $tanggal = intval($arr_tgl[0]);
+        
+        $this->load->model('Attendance_model');
+        $data['attendance'] = $this->Attendance_model->get_attendance_data_on_date($tahun,$bulan,$tanggal,$data['department']);
         
         if ($data['attendance'] == NULL) {
             $this->session->set_flashdata('message', 'Unable to find attendance data.');
@@ -559,8 +566,16 @@ class Attendance extends CI_Controller {
             redirect('attendance/'.$this->filter_daily_rpt_alias);
         }
         
+        $this->load->helper('custom_string');
         $this->load->helper('custom_date');
-        $data['month_year'] = get_month_name($data['month']).' '.$data['year'];
+        $data['tanggal'] = $tanggal.' '.get_month_name($bulan).' '.$tahun;
+        
+        $department_url = '';
+        foreach ($data['department'] as $key => $value) {
+            $department_url = $department_url.'D'.$key;
+        }
+        
+        $data['export_xls3_url'] = site_url('export/xls3/'.$tahun.'/'.$bulan.'/'.$tanggal.'/'.$department_url);
         
         $this->load->view('attendance/rpt_daily',$data);
     }

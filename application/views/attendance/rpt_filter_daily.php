@@ -14,7 +14,7 @@ $this->load->view('template_groundwork/body_menu');
       </div>
       <?php if (!empty($message)) { ?>
       <div class="row bounceInLeft animated">
-        <div class="one half padded align-center">
+        <div class="four fifth padded align-center">
           <div class="row"><p class="message dismissible<?php echo (!empty($message_type))?' '.$message_type:' error'; ?>"><?php echo $message; ?><p></div>
         </div>
       </div>
@@ -26,8 +26,52 @@ $this->load->view('template_groundwork/body_menu');
           <form action="<?php echo $form_action_url; ?>" method="post">
             <fieldset>
               <div class="row">
-                <div class="two fourth padded">
-                  <label for="name">Tanggal</label>
+                <div class="two fourth gap-left gap-right gap-top">
+                  <label for="department">Bagian/Prodi</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="one whole padded box square">
+                <?php
+                $str_check = '';
+                $checknum = 0;
+                foreach ($department as $key => $value) {
+                    if (($checknum % 4) == 0) {
+                        $str_check = $str_check.'<div class="row half-gap-bottom">';
+                    }
+
+                    $data_check = array(
+                      'name'        => 'department['.$key.']',
+                      'value'       => 1,
+                      'checked'     => TRUE
+                    );
+
+                    $str_check = $str_check.'<div class="one fourth">';
+                    $str_check = $str_check.'<div class="two twelfth">';
+                    $str_check = $str_check.form_checkbox($data_check);
+                    $str_check = $str_check.'</div>';
+                    $str_check = $str_check.'<div class="nine twelfth">';
+                    $str_check = $str_check.$value;
+                    $str_check = $str_check.'</div>';
+                    $str_check = $str_check.'</div>';
+
+                    $checknum++;
+                    if (($checknum % 4) == 0) {
+                        $str_check = $str_check.'</div>';
+                    }
+                }
+
+                if (($checknum % 4) > 0) {
+                  $str_check = $str_check.'</div>';
+                }
+
+                echo $str_check;
+                ?>
+                </div>
+              </div>
+              <div class="row">
+                <div class="one fourth padded">
+                  <label for="tanggal">Tanggal</label>
                   <span class="select-wrap"><?php
                   $datepicker = array(
                     'name'        => 'tanggal',
@@ -35,48 +79,22 @@ $this->load->view('template_groundwork/body_menu');
                   );
                   echo form_input($datepicker);
                   ?></span>
+                  <!-- DatePicker -->
+                  <script type="text/javascript" src="<?php echo base_url('assets/zebra_datepicker/javascript')?>/zebra_datepicker.js"></script>
+                  <link rel="stylesheet" href="<?php echo base_url('assets/zebra_datepicker/css')?>/default.css" type="text/css">
+                  <script>
+                    $(document).ready(function() {
+                        // assuming the controls you want to attach the plugin to 
+                        // have the "datepicker" class set
+                        $('#datepicker').Zebra_DatePicker({
+                            months: <?php echo $month_array; ?>,
+                            readonly_element: true,
+                            show_clear_date: false,
+                            format: 'D, d/m/Y'
+                        });
+                    });
+                  </script>
                 </div>
-              </div>
-              <div class="row">
-                <div class="two fourth padded">
-                  <label for="month">Bagian/Prodi</label>
-                </div>
-              </div>
-              <div class="row">
-              <?php
-              $str_check = '';
-              $checknum = 0;
-              foreach ($department as $key => $value) {
-                  if (($checknum % 4) == 0) {
-                      $str_check = $str_check.'<div class="row half-gap-bottom">';
-                  }
-                  
-                  $data_check = array(
-                    'name'        => 'department['.$key.']',
-                    'value'       => 1,
-                  );
-                  
-                  $str_check = $str_check.'<div class="one fourth">';
-                  $str_check = $str_check.'<div class="two twelfth">';
-                  $str_check = $str_check.form_checkbox($data_check);
-                  $str_check = $str_check.'</div>';
-                  $str_check = $str_check.'<div class="nine twelfth">';
-                  $str_check = $str_check.$value;
-                  $str_check = $str_check.'</div>';
-                  $str_check = $str_check.'</div>';
-                  
-                  $checknum++;
-                  if (($checknum % 4) == 0) {
-                      $str_check = $str_check.'</div>';
-                  }
-              }
-              
-              if (($checknum % 4) > 0) {
-                $str_check = $str_check.'</div>';
-              }
-              
-              echo $str_check;
-              ?>
               </div>
               <div class="row">
                 <div class="two fifth padded">

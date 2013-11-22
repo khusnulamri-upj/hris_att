@@ -1,4 +1,5 @@
 <?php
+require_once '../location.php';
 /**
  * upload.php
  *
@@ -37,9 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 // Uncomment this one to fake upload time
 // usleep(5000);
 
+/*$mdb_remote_location = '/assets';
+$mdb_remote_filename = 'import.mdb';*/
+
 // Settings
 //$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "plupload";
-$targetDir = '..'. DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'assets';
+$targetDir = '..'. DIRECTORY_SEPARATOR .'..'. $mdb_remote_location;
 $cleanupTargetDir = true; // Remove old files
 $maxFileAge = 5 * 3600; // Temp file age in seconds
 
@@ -58,7 +62,7 @@ if (isset($_REQUEST["name"])) {
 }
 
 //$filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
-$fileName = 'import.mdb';
+$fileName = $mdb_remote_filename;
 $filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
 
 //AMR: Delete Files

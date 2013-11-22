@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-    <title>Attendance I.S &hearts; Universitas Pembangunan Jaya</title>
+    <title><?php echo $this->Parameter->get_value('APP_NAME') ?></title>
     <!-- Modernizr -->
     <script src="<?php echo base_url('assets/groundwork')?>/js/libs/modernizr-2.6.2.min.js"></script>
     <!-- jQuery-->

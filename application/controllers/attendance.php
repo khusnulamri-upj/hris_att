@@ -42,9 +42,9 @@ class Attendance extends CI_Controller {
         }
 
         // Note: This is only included to create base urls for purposes of this demo only and are not necessarily considered as 'Best practice'.
-        $this->load->vars('base_url', 'http://localhost/hris_att/');
+        /*$this->load->vars('base_url', 'http://localhost/hris_att/');
         $this->load->vars('includes_dir', 'http://localhost/hris_att/includes/');
-        $this->load->vars('current_url', $this->uri->uri_to_assoc(1));
+        $this->load->vars('current_url', $this->uri->uri_to_assoc(1));*/
 
         // Define a global variable to store data that is then used by the end view page.
         $this->data = null;

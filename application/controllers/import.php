@@ -39,9 +39,9 @@ class Import extends CI_Controller {
         }
 
         // Note: This is only included to create base urls for purposes of this demo only and are not necessarily considered as 'Best practice'.
-        $this->load->vars('base_url', 'http://localhost/hris_att/');
+        /*$this->load->vars('base_url', 'http://localhost/hris_att/');
         $this->load->vars('includes_dir', 'http://localhost/hris_att/includes/');
-        $this->load->vars('current_url', $this->uri->uri_to_assoc(1));
+        $this->load->vars('current_url', $this->uri->uri_to_assoc(1));*/
 
         // Define a global variable to store data that is then used by the end view page.
         $this->data = null;
@@ -125,6 +125,9 @@ class Import extends CI_Controller {
         $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_get_data')."',";
         $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Importing MDB Data To Database', after: 'Importing MDB Data Finished'},";
         
+        $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_files_operation')."',";
+        $data['arr_interactive'] = $data['arr_interactive']."{divid: ''},";
+        
         $data['arr_controllers'] = $data['arr_controllers']."'".base_url('import/mdb_process_data')."',";
         $data['arr_interactive'] = $data['arr_interactive']."{divid: 'ajaxLog', before: 'Processing MDB Data', after: 'Processing MDB Data Finished'},";
         
@@ -132,6 +135,14 @@ class Import extends CI_Controller {
         $data['arr_interactive'] = substr($data['arr_interactive'], 0, -1)."]";
         
         $data['ajaximg'] = "' <i class=\"icon-spinner icon-spin\"></i>'";
+        
+        require_once '/assets/location.php';
+        
+        if (file_exists($mdb_host_location.$mdb_remote_location.DIRECTORY_SEPARATOR.$mdb_remote_filename)) {
+            $data['file_exist'] = 'File '.$mdb_remote_filename.' is exist in server.';
+        } else {
+            $data['file_exist'] = 'File '.$mdb_remote_filename.' is not exist in server.';
+        }
         
         $this->load->view('attendance/import_vw_plupload',$data);
     }
@@ -154,6 +165,15 @@ class Import extends CI_Controller {
 
         $this->ftp->close();
     }*/
+    
+    public function mdb_files_operation() {
+        require_once '/assets/location.php';
+        //$file_path = '.'.$mdb_remote_location.DIRECTORY_SEPARATOR.$mdb_remote_filename;
+        $file_path = $mdb_host_location.$mdb_remote_location.DIRECTORY_SEPARATOR.$mdb_remote_filename;
+        //$file_path = str_replace(DIRECTORY_SEPARATOR, '/', $file_path);
+        //echo $file_path;
+        unlink($file_path);
+    }
     
     public function mdb_get_data() {
         //TO DB TEMPORARY

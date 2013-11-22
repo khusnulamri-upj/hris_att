@@ -39,9 +39,9 @@ class Export extends CI_Controller {
         }
 
         // Note: This is only included to create base urls for purposes of this demo only and are not necessarily considered as 'Best practice'.
-        $this->load->vars('base_url', 'http://localhost/hris_att/');
+        /*$this->load->vars('base_url', 'http://localhost/hris_att/');
         $this->load->vars('includes_dir', 'http://localhost/hris_att/includes/');
-        $this->load->vars('current_url', $this->uri->uri_to_assoc(1));
+        $this->load->vars('current_url', $this->uri->uri_to_assoc(1));*/
 
         // Define a global variable to store data that is then used by the end view page.
         $this->data = null;
@@ -318,15 +318,15 @@ class Export extends CI_Controller {
         }
         $shortname = $first_name.$second_name;
         $objPHPExcel->getActiveSheet()->setTitle(($sheetNow+1).'.'.$shortname);
-        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-        $objPHPExcel->setActiveSheetIndex(0);
-        
         // Page Setup
         $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
         $objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
         $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToPage(true);
         $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(0);
         $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(1);
+        
+        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
+        $objPHPExcel->setActiveSheetIndex(0);
         
         //clean the output buffer
         ob_end_clean();
@@ -612,18 +612,19 @@ class Export extends CI_Controller {
             }
             $shortname = $first_name.$second_name;
             $objPHPExcel->getActiveSheet()->setTitle(($sheetNow+1).'.'.$shortname);
+            
+            //Page Setup
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToPage(true);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(0);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(1);
+            
             $sheetNow++;
         }
         
         // Set active sheet index to the first sheet, so Excel opens this as the first sheet
         $objPHPExcel->setActiveSheetIndex(0);
-        
-        // Page Setup
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToPage(true);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(0);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(1);
         
         //clean the output buffer
         /*ob_end_clean();
@@ -877,6 +878,13 @@ class Export extends CI_Controller {
             // Rename worksheet
             $objPHPExcel->getActiveSheet()->setTitle(($sheetNow+1).'.'.$this->trim_filename($department_name));
             
+            // Page Setup
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToPage(true);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(0);
+            $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(1);
+            
             if ($max_prsn_in_sheet == $jml_prsn_in_sheet) {
                 $objPHPExcel->getActiveSheet()->setCellValue($cell_col_first, 'PRESENSI KARYAWAN');
                 $row_range = $cell_col_first.':'.$this->xls_inc($cell_col_first, 'C', ($num_col*$jml_prsn_in_sheet-1));
@@ -899,13 +907,6 @@ class Export extends CI_Controller {
         $objPHPExcel->getActiveSheet()->getStyle($row_range)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $objPHPExcel->getActiveSheet()->getStyle($row_range)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
-        // Page Setup
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToPage(true);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(0);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(1);
-        
         // Set active sheet index to the first sheet, so Excel opens this as the first sheet
         $objPHPExcel->setActiveSheetIndex(0);
         
@@ -934,21 +935,30 @@ class Export extends CI_Controller {
         }
     }
     
-    public function xls3($personnel = NULL, $year = NULL, $month = NULL) {
-        $this->xls_rpt_attendance_daily($year, $month, $tanggal, );
+    public function xls3($year = NULL, $month = NULL, $tanggal = NULL, $departments = NULL) {
+        $this->xls_rpt_attendance_daily($year, $month, $tanggal, $departments);
     }
     
-    public function xls_rpt_attendance_daily($personnel = NULL, $year = NULL, $month = NULL) {
+    public function xls_rpt_attendance_daily($year = NULL, $month = NULL, $tanggal = NULL, $departments = NULL) {
         if (!$this->flexi_auth->is_privileged('vw_daily_rpt')) {
             $this->session->set_flashdata('message', '<p class="error">You do not have enough privileges.</p>');
             redirect('user');
         }
         
-        $url_redirect = 'attendance/reporta';
-        if (empty($personnel) || empty($year) || empty($month)) {
+        $url_redirect = 'attendance/reportc';
+        if (empty($year) || empty($month) || empty($tanggal) || (empty($departments))) {
             $this->session->set_flashdata('message', 'Unable to find attendance data.');
             $this->session->set_flashdata('message_type', 'error');
             redirect($url_redirect);
+        }
+        
+        $arr_temp = explode('D', $departments);
+        $arr_dept = array();
+        
+        foreach ($arr_temp as $value) {
+            if (!empty($value)) {
+                $arr_dept[$value] = 1;
+            }
         }
         
         set_time_limit(0);
@@ -962,8 +972,7 @@ class Export extends CI_Controller {
         // Set document properties
         $objPHPExcel->getProperties()->setCreator("Universitas Pembangunan Jaya")
                 ->setLastModifiedBy("ICT")
-                ->setTitle("Laporan Presensi Per Bulan Per Karyawan/Dosen");
-                //->setCategory("Report");
+                ->setTitle("Laporan Presensi Per Tanggal");
 
         $styleThinBlackBorderOutline = array(
             'borders' => array(
@@ -975,93 +984,77 @@ class Export extends CI_Controller {
         );
         
         $this->load->helper('custom_string');
-        $this->load->model('Personnel_model');
-        $personnel_name = do_ucwords($this->Personnel_model->get_personnel_name($personnel));
-        
-        $this->load->model('Department_model');
-        $department_name = do_ucwords($this->Department_model->get_department_name($this->Personnel_model->get_dept_id($personnel)));
+        $sheetNow = 0;
         
         $this->load->helper('custom_date');
-        $month_year = get_month_name($month).' '.$year;
-        
-        $sheetNow = 0;
+        $tgl_desc = $tanggal.' '.get_month_name($month).' '.$year;
         
         //HEADER VALUE
         $objPHPExcel->setActiveSheetIndex($sheetNow)
             ->setCellValue('A1', 'Laporan Presensi Karyawan/Dosen')
-            ->setCellValue('A2', 'Nama Karyawan/Dosen')
-            ->setCellValue('D2', ': ' . $personnel_name)
-            ->setCellValue('A3', 'Bagian/Prodi')
-            ->setCellValue('D3', ': ' . $department_name)
-            ->setCellValue('A4', 'Bulan')
-            ->setCellValue('D4', ': ' . $month_year);
+            ->setCellValue('A2', 'Tanggal : '.$tgl_desc);
         //HEADER CELL
-        $objPHPExcel->getActiveSheet()->mergeCells('A1:F1');
-        $objPHPExcel->getActiveSheet()->mergeCells('A2:C2');
-        $objPHPExcel->getActiveSheet()->mergeCells('A3:C3');
-        $objPHPExcel->getActiveSheet()->mergeCells('A4:C4');
-        $objPHPExcel->getActiveSheet()->mergeCells('D2:F2');
-        $objPHPExcel->getActiveSheet()->mergeCells('D3:F3');
-        $objPHPExcel->getActiveSheet()->mergeCells('D4:F4');
+        $objPHPExcel->getActiveSheet()->mergeCells('A1:G1');
+        $objPHPExcel->getActiveSheet()->mergeCells('A2:G2');
         //HEADER STYLE
         $objPHPExcel->getActiveSheet()->getStyle('A1:F1')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-        $objPHPExcel->getActiveSheet()->getStyle('A1:A4')->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle('D2:D4')->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:A2')->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle('D2')->getFont()->setBold(true);
         
         $objPHPExcel->getActiveSheet()->getRowDimension('1')->setRowHeight(30);
 
         
         //TABLE HEADER VALUE
         $objPHPExcel->getActiveSheet()
-            ->setCellValue('A6', 'Tanggal')
-            ->setCellValue('B6', 'Hari')
-            ->setCellValue('C6', 'Jam Masuk')
-            ->setCellValue('D6', 'Jam Keluar')
-            ->setCellValue('E6', 'Durasi Keterlambatan')
-            ->setCellValue('F6', 'Keterangan');
+            ->setCellValue('A4', 'No.')    
+            ->setCellValue('B4', 'Nama')
+            ->setCellValue('C4', 'Bagian/Prodi')
+            ->setCellValue('D4', 'Jam Masuk')
+            ->setCellValue('E4', 'Jam Keluar')
+            ->setCellValue('F4', 'Durasi Keterlambatan')
+            ->setCellValue('G4', 'Keterangan');
         //TABLE HEADER STYLE
-        $objPHPExcel->getActiveSheet()->getStyle('E6')->getAlignment()->setWrapText(true);
-        $objPHPExcel->getActiveSheet()->getStyle('A6:F6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objPHPExcel->getActiveSheet()->getStyle('A6:F6')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-        $objPHPExcel->getActiveSheet()->getStyle('A6:F6')->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle('A6')->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle('B6')->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle('C6')->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle('D6')->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle('E6')->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle('F6')->applyFromArray($styleThinBlackBorderOutline);
+        $objPHPExcel->getActiveSheet()->getStyle('F4')->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getStyle('A4:G4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objPHPExcel->getActiveSheet()->getStyle('A4:G4')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        $objPHPExcel->getActiveSheet()->getStyle('A4:G4')->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle('A4')->applyFromArray($styleThinBlackBorderOutline);
+        $objPHPExcel->getActiveSheet()->getStyle('B4')->applyFromArray($styleThinBlackBorderOutline);
+        $objPHPExcel->getActiveSheet()->getStyle('C4')->applyFromArray($styleThinBlackBorderOutline);
+        $objPHPExcel->getActiveSheet()->getStyle('D4')->applyFromArray($styleThinBlackBorderOutline);
+        $objPHPExcel->getActiveSheet()->getStyle('E4')->applyFromArray($styleThinBlackBorderOutline);
+        $objPHPExcel->getActiveSheet()->getStyle('F4')->applyFromArray($styleThinBlackBorderOutline);
+        $objPHPExcel->getActiveSheet()->getStyle('G4')->applyFromArray($styleThinBlackBorderOutline);
         
-        $objPHPExcel->getActiveSheet()->getRowDimension('6')->setRowHeight(30);
+        $objPHPExcel->getActiveSheet()->getRowDimension('4')->setRowHeight(30);
         
-        $cell = 'A7'; //INITIAL CELL
+        $cell = 'A5'; //INITIAL CELL
         
         $this->load->model('Attendance_model');
-        $attendance = $this->Attendance_model->get_attendance_data_personnel_monthly($personnel,$year,$month);
+        $attendance = $this->Attendance_model->get_attendance_data_on_date($year,$month,$tanggal,$arr_dept);
         
+        $i = 1;
         foreach ($attendance as $a) {
-            if ($a->is_holiday) {
-                $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 5))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-                $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 5))->getFill()->getStartColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
-                $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 5))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_WHITE);
-            }
             if ($a->is_late) {
-                $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 2))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
-                $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 4))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+                $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+                $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
             }
             if ($a->is_early) {
-                $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+                $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 4))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
             }
-            $col1 = $a->tanggal;
-            $col2 = $a->hari;
-            $col3 = $a->jam_masuk;
-            $col4 = $a->jam_keluar;
-            $col5 = $a->waktu_telat_masuk;
-            $col6 = $a->keterangan;
-            if ($col6 == '') {
+            
+            $col1 = $i++;
+            $col2 = do_ucwords($a->nama);
+            $col3 = do_ucwords($a->dept_name);
+            $col4 = $a->jam_masuk;
+            $col5 = $a->jam_keluar;
+            $col6 = $a->waktu_telat_masuk;
+            $col7 = $a->keterangan;
+            /*if ($col6 == '') {
                 $col6 = $a->desc_holiday;
             } else if (!($a->desc_holiday == '')) {
                 $col6 = $col6."\n".$a->desc_holiday;
-            }
+            }*/
             //TABLE CONTENT VALUE
             $objPHPExcel->getActiveSheet()
                 ->setCellValue($cell, $col1)                    
@@ -1069,94 +1062,22 @@ class Export extends CI_Controller {
                 ->setCellValue($this->xls_inc($cell, 'C', 2), $col3)   
                 ->setCellValue($this->xls_inc($cell, 'C', 3), $col4)   
                 ->setCellValue($this->xls_inc($cell, 'C', 4), $col5)   
-                ->setCellValue($this->xls_inc($cell, 'C', 5), $col6);
+                ->setCellValue($this->xls_inc($cell, 'C', 5), $col6)
+                ->setCellValue($this->xls_inc($cell, 'C', 6), $col7);
             //TABLE CONTENT STYLE
-            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->getAlignment()->setWrapText(true);
+            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 6))->getAlignment()->setWrapText(true);
             $objPHPExcel->getActiveSheet()->getStyle($cell)->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 1))->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 2))->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3))->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 4))->applyFromArray($styleThinBlackBorderOutline);
             $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->applyFromArray($styleThinBlackBorderOutline);
-            $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 4))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 6))->applyFromArray($styleThinBlackBorderOutline);
+            $objPHPExcel->getActiveSheet()->getStyle($cell)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 1) . ":" . $this->xls_inc($cell, 'C', 2))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3) . ":" . $this->xls_inc($cell, 'C', 5))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 6))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
             
-            $cell = $this->xls_inc($cell, 'R', 1);
-        }
-        
-        $sa = $this->Attendance_model->get_summary_attendance_data_personnel_monthly($personnel,$year,$month);
-        
-        $col1 = $sa->sum_waktu_telat_masuk;
-        $col2 = $sa->sum_is_late;
-        $col3 = $sa->sum_counter_hadir;
-        //SUMMARY TABLE CONTENT VALUE
-        $objPHPExcel->getActiveSheet()
-            ->setCellValue($this->xls_inc($cell, 'C', 3), 'Total Durasi Keterlambatan')   
-            ->setCellValue($this->xls_inc($cell, 'C', 5), $col1);
-        //SUMMARY TABLE CONTENT CELL
-        $objPHPExcel->getActiveSheet()->mergeCells($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 4));
-        //SUMMARY TABLE CONTENT STYLE
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 4))->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 5))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 5))->getFont()->setBold(true);
-        $cell = $this->xls_inc($cell, 'R', 1);
-        //SUMMARY TABLE CONTENT VALUE
-        $objPHPExcel->getActiveSheet()
-            ->setCellValue($this->xls_inc($cell, 'C', 3), 'Total Keterlambatan (hari)')   
-            ->setCellValue($this->xls_inc($cell, 'C', 5), $col2);
-        //SUMMARY TABLE CONTENT CELL
-        $objPHPExcel->getActiveSheet()->mergeCells($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 4));
-        //SUMMARY TABLE CONTENT STYLE
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 4))->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 5))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 5))->getFont()->setBold(true);
-        $cell = $this->xls_inc($cell, 'R', 1);
-        //SUMMARY TABLE CONTENT VALUE
-        $objPHPExcel->getActiveSheet()
-            ->setCellValue($this->xls_inc($cell, 'C', 3), 'Total Kehadiran (hari)')   
-            ->setCellValue($this->xls_inc($cell, 'C', 5), $col3);
-        //SUMMARY TABLE CONTENT CELL
-        $objPHPExcel->getActiveSheet()->mergeCells($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 4));
-        //SUMMARY TABLE CONTENT STYLE
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 4))->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 5))->applyFromArray($styleThinBlackBorderOutline);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 5))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3).':'.$this->xls_inc($cell, 'C', 5))->getFont()->setBold(true);
-        $cell = $this->xls_inc($cell, 'R', 1);
-        
-        $cell = $this->xls_inc($cell, 'R', 1);
-        
-        //SUMMARY HEADER VALUE
-        $objPHPExcel->setActiveSheetIndex($sheetNow)
-            ->setCellValue($cell, 'JUMLAH KETERANGAN');
-        //SUMMARY HEADER CELL
-        $objPHPExcel->getActiveSheet()->mergeCells($cell.':'.$this->xls_inc($cell, 'C', 3));
-        //SUMMARY HEADER STYLE
-        $objPHPExcel->getActiveSheet()->getStyle($cell.':'.$this->xls_inc($cell, 'C', 3))->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 3))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-        $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 3))->getFill()->getStartColor()->setARGB(PHPExcel_Style_Color::COLOR_YELLOW);
-        
-        $summary_of_keterangan = $this->Attendance_model->get_summary_of_keterangan($personnel,$year,$month);
-        
-        $cell = $this->xls_inc($cell, 'R', 1);
-        
-        foreach ($summary_of_keterangan as $s) {
-            $col1 = $s->keterangan;
-            $col2 = $s->jumlah;
-            //SUMMARY CONTENT VALUE
-            $objPHPExcel->getActiveSheet()
-                ->setCellValue($cell, $col1)                    
-                ->setCellValue($this->xls_inc($cell, 'C', 3), $col2);
-            //SUMMARY CONTENT CELL
-            $objPHPExcel->getActiveSheet()->mergeCells($cell.':'.$this->xls_inc($cell, 'C', 2));
-            //SUMMARY CONTENT STYLE
-            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3))->getFont()->setBold(true);
-            $objPHPExcel->getActiveSheet()->getStyle($this->xls_inc($cell, 'C', 3))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-            $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 3))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
-            $objPHPExcel->getActiveSheet()->getStyle($cell . ":" . $this->xls_inc($cell, 'C', 3))->getFill()->getStartColor()->setARGB(PHPExcel_Style_Color::COLOR_YELLOW);
-        
             $cell = $this->xls_inc($cell, 'R', 1);
         }
         
@@ -1164,33 +1085,29 @@ class Export extends CI_Controller {
         $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(15);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(15);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
         
         // Rename worksheet
-        $arr_temp = explode(' ',$personnel_name);
-        $first_name = $arr_temp[0];
-        if (sizeof($arr_temp) > 1) {
-            $second_name = $arr_temp[1];
-        }
-        $shortname = $first_name.$second_name;
-        $objPHPExcel->getActiveSheet()->setTitle(($sheetNow+1).'.'.$shortname);
-        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->setTitle(($sheetNow+1).'.'.$year.$month.$tanggal);
         
         // Page Setup
         $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
         $objPHPExcel->getActiveSheet()->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
         $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToPage(true);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(0);
-        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(1);
+        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToWidth(1);
+        $objPHPExcel->getActiveSheet()->getPageSetup()->setFitToHeight(0);
+        
+        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
+        $objPHPExcel->setActiveSheetIndex(0);
         
         //clean the output buffer
         ob_end_clean();
         // Redirect output to a client’s web browser (Excel5)
         header('Content-Type: application/vnd.ms-excel');
         //MONTHLY PERSONNEL ATTENDANCE REPORT
-        header('Content-Disposition: attachment;filename="DAR'.$personnel.'_'.$shortname.'_'.$year.'_'.$month.'.xls"');
+        header('Content-Disposition: attachment;filename="DAR'.$year.'_'.$month.'_'.$tanggal.'.xls"');
         header('Cache-Control: max-age=0');
         // If you're serving to IE 9, then the following may be needed
         header('Cache-Control: max-age=1');

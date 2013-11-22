@@ -17,8 +17,7 @@ $this->load->view('template_groundwork/body_menu');
       <div class="row padded">
         <div class="one half">
           <div id="support" style="border-style:none;">Your browser doesn't have Flash, Silverlight or HTML5 support.</div>
-          <div id="filelist" style="border-style:none;"></div>
-          <pre id="console" style="border-style:none;"></pre>
+          <pre id="plupload-console" style="border-style:none;"><?php echo $file_exist; ?></pre>
         </div>
       </div>
       <div class="row padded">
@@ -30,22 +29,17 @@ $this->load->view('template_groundwork/body_menu');
             <a role="button" id="processfiles" href="javascript:;">Process File</a>
           </div>
         </div>
-          <!--<div class="three tenth">
-          
-          <a role="button" rel="next" class="gap-bottom gap-right" id="import"<?php echo $button_disabled; ?>>Transfer Data</a>
-        </div>-->
       </div>
       <div class="row padded" id="console">
         <div class="three fifth">  
           <pre data-lang="html" id="ajaxLog"></pre>
         </div>
       </div>
-      <div class="row padded" id="space" style="min-height: 9.4em; ">
-      </div>
+      <br/>
       <br/>
     </div>
     <script type="text/javascript" src="<?= base_url()."assets/js/ajaxLog.js"; ?>"></script>
-    <script type="text/javascript">function aj(){var a=<?php echo $ajaximg; ?>;var c=<?php echo $arr_controllers; ?>;var i=<?php echo $arr_interactive; ?>;sequenceRequest(c,i,a);}$(document).ready(function(){$('#console').hide()});$('#import').click(function(){$('#console').show();$('#space').hide();aj();});</script>
+    <script type="text/javascript">function aj(){var a=<?php echo $ajaximg; ?>;var c=<?php echo $arr_controllers; ?>;var i=<?php echo $arr_interactive; ?>;sequenceRequest(c,i,a);}</script>
     <script type="text/javascript">
     // Custom example logic
 
@@ -100,7 +94,7 @@ $this->load->view('template_groundwork/body_menu');
 
                 Error: function(up, err) {
                         $("#ajaxNow").remove();
-                        document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;
+                        document.getElementById('plupload-console').innerHTML += "\nError #" + err.code + ": " + err.message;
                 }
         }
 

@@ -8,8 +8,9 @@ class Import_model extends CI_Model {
     }
     
     function set_mdb_connect() {
-        
-        $file_path = $this->Parameter->get_value('FILE_ON_SERVER_FOR_MDB');
+        require_once '../assets/location.php';
+        $file_path = $mdb_host_location.$mdb_remote_location.DIRECTORY_SEPARATOR.$mdb_remote_filename;
+        //$file_path = $this->Parameter->get_value('FILE_ON_SERVER_FOR_MDB');
         
         $config['hostname'] = "Driver={Microsoft Access Driver (*.mdb)}; DBQ=".$file_path;
         $config['username'] = "";
